@@ -46,6 +46,7 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.ktor.client.android)
             implementation(libs.kotlinx.coroutines.android)
 
         }
@@ -89,9 +90,12 @@ kotlin {
         }
         jsMain.dependencies {
             implementation(libs.ktor.client.js)
+
         }
         wasmJsMain.dependencies {
-            implementation(libs.ktor.client.js)
+//            implementation(libs.ktor.client.wasm)
+            implementation(libs.ktor.client.cio)
+
         }
     }
 }

@@ -30,8 +30,10 @@ val dataModule = module {
             install(ContentNegotiation) {
                 json(
                     Json {
-                        ignoreUnknownKeys = true
+                        encodeDefaults = true
                         isLenient = true
+                        coerceInputValues = true
+                        ignoreUnknownKeys = true
                     }
                 )
             }
