@@ -19,7 +19,9 @@ class DashboardViewModel(
 
     init {
         viewModelScope.launch {
-            getCurrentWeatherDataUseCase(WeatherRequest(24.8607,67.0011)).collect {
+            // Karachi Region WeatherRequest(24.8607,67.0011)
+            val request = WeatherRequest(lat = 24.8607, lng = 67.0011)
+            getCurrentWeatherDataUseCase(params = request).collect {
 //                state = it.count ?: ""
                 state = it.wind.toString()
             }
