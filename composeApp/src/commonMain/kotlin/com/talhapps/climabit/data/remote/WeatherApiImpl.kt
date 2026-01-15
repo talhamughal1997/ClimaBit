@@ -1,5 +1,6 @@
 package com.talhapps.climabit.data.remote
 
+import com.talhapps.climabit.data.core.executeAsFlow
 import com.talhapps.climabit.domain.model.weather.AirPollutionResponse
 import com.talhapps.climabit.domain.model.weather.CurrentWeatherResponse
 import com.talhapps.climabit.domain.model.weather.Forecast16Response
@@ -8,10 +9,10 @@ import com.talhapps.climabit.domain.model.weather.GeocodingResponse
 import com.talhapps.climabit.domain.model.weather.OneCallResponse
 import com.talhapps.climabit.domain.model.weather.ReverseGeocodingResponse
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.http.path
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Default implementation backed by OpenWeather APIs.
@@ -24,42 +25,42 @@ class WeatherApiImpl(
     private val baseUrl: String = DEFAULT_BASE_URL
 ) : WeatherApi {
 
-    override suspend fun getCurrentWeatherByCoordinates(
+    override fun getCurrentWeatherByCoordinates(
         lat: Double,
         lon: Double
-    ): CurrentWeatherResponse {
-        return client.get(baseUrl) {
+    ): Flow<CurrentWeatherResponse> = executeAsFlow {
+        client.get(baseUrl) {
             url {
                 path("data", "2.5", "weather")
                 parameter("lat", lat)
                 parameter("lon", lon)
                 parameter("appid", apiKey)
             }
-        }.body()
+        }
     }
 
-    override suspend fun getCurrentWeatherByCityName(
+    override fun getCurrentWeatherByCityName(
         cityName: String,
         countryCode: String?
-    ): CurrentWeatherResponse {
+    ): Flow<CurrentWeatherResponse> = executeAsFlow {
         val q = if (countryCode.isNullOrBlank()) cityName else "$cityName,$countryCode"
-        return client.get(baseUrl) {
+        client.get(baseUrl) {
             url {
                 path("data", "2.5", "weather")
                 parameter("q", q)
                 parameter("appid", apiKey)
             }
-        }.body()
+        }
     }
 
-    override suspend fun getOneCall(
+    override fun getOneCall(
         lat: Double,
         lon: Double,
         exclude: String?,
         units: String?,
         language: String?
-    ): OneCallResponse {
-        return client.get(baseUrl) {
+    ): Flow<OneCallResponse> = executeAsFlow {
+        client.get(baseUrl) {
             url {
                 path("data", "3.0", "onecall")
                 parameter("lat", lat)
@@ -69,18 +70,18 @@ class WeatherApiImpl(
                 if (!language.isNullOrBlank()) parameter("lang", language)
                 parameter("appid", apiKey)
             }
-        }.body()
+        }
     }
 
-    override suspend fun getOneCallHistorical(
+    override fun getOneCallHistorical(
         lat: Double,
         lon: Double,
         dt: Long,
         exclude: String?,
         units: String?,
         language: String?
-    ): OneCallResponse {
-        return client.get(baseUrl) {
+    ): Flow<OneCallResponse> = executeAsFlow {
+        client.get(baseUrl) {
             url {
                 path("data", "3.0", "onecall", "timemachine")
                 parameter("lat", lat)
@@ -91,16 +92,16 @@ class WeatherApiImpl(
                 if (!language.isNullOrBlank()) parameter("lang", language)
                 parameter("appid", apiKey)
             }
-        }.body()
+        }
     }
 
-    override suspend fun getFiveDayForecastByCoordinates(
+    override fun getFiveDayForecastByCoordinates(
         lat: Double,
         lon: Double,
         units: String?,
         language: String?
-    ): Forecast5Response {
-        return client.get(baseUrl) {
+    ): Flow<Forecast5Response> = executeAsFlow {
+        client.get(baseUrl) {
             url {
                 path("data", "2.5", "forecast")
                 parameter("lat", lat)
@@ -109,16 +110,16 @@ class WeatherApiImpl(
                 if (!language.isNullOrBlank()) parameter("lang", language)
                 parameter("appid", apiKey)
             }
-        }.body()
+        }
     }
 
-    override suspend fun getSixteenDayForecastByCoordinates(
+    override fun getSixteenDayForecastByCoordinates(
         lat: Double,
         lon: Double,
         units: String?,
         language: String?
-    ): Forecast16Response {
-        return client.get(baseUrl) {
+    ): Flow<Forecast16Response> = executeAsFlow {
+        client.get(baseUrl) {
             url {
                 // 16 day daily forecast (paid plan)
                 path("data", "2.5", "forecast", "daily")
@@ -128,35 +129,35 @@ class WeatherApiImpl(
                 if (!language.isNullOrBlank()) parameter("lang", language)
                 parameter("appid", apiKey)
             }
-        }.body()
+        }
     }
 
     override suspend fun getCurrentAirPollution(
         lat: Double,
         lon: Double
-    ): AirPollutionResponse {
-        return client.get(baseUrl) {
+    ): Flow<AirPollutionResponse> = executeAsFlow {
+        client.get(baseUrl) {
             url {
                 path("data", "2.5", "air_pollution")
                 parameter("lat", lat)
                 parameter("lon", lon)
                 parameter("appid", apiKey)
             }
-        }.body()
+        }
     }
 
     override suspend fun getForecastAirPollution(
         lat: Double,
         lon: Double
-    ): AirPollutionResponse {
-        return client.get(baseUrl) {
+    ): Flow<AirPollutionResponse> = executeAsFlow {
+        client.get(baseUrl) {
             url {
                 path("data", "2.5", "air_pollution", "forecast")
                 parameter("lat", lat)
                 parameter("lon", lon)
                 parameter("appid", apiKey)
             }
-        }.body()
+        }
     }
 
     override suspend fun getHistoricalAirPollution(
@@ -164,8 +165,8 @@ class WeatherApiImpl(
         lon: Double,
         start: Long,
         end: Long
-    ): AirPollutionResponse {
-        return client.get(baseUrl) {
+    ): Flow<AirPollutionResponse> = executeAsFlow {
+        client.get(baseUrl) {
             url {
                 path("data", "2.5", "air_pollution", "history")
                 parameter("lat", lat)
@@ -174,7 +175,7 @@ class WeatherApiImpl(
                 parameter("end", end)
                 parameter("appid", apiKey)
             }
-        }.body()
+        }
     }
 
     override suspend fun getGeocodingDirect(
@@ -182,28 +183,28 @@ class WeatherApiImpl(
         stateCode: String?,
         countryCode: String?,
         limit: Int?
-    ): List<GeocodingResponse> {
+    ): Flow<List<GeocodingResponse>> = executeAsFlow {
         val q = buildString {
             append(cityName)
             if (!stateCode.isNullOrBlank()) append(",$stateCode")
             if (!countryCode.isNullOrBlank()) append(",$countryCode")
         }
-        return client.get(baseUrl) {
+        client.get(baseUrl) {
             url {
                 path("geo", "1.0", "direct")
                 parameter("q", q)
                 if (limit != null) parameter("limit", limit)
                 parameter("appid", apiKey)
             }
-        }.body()
+        }
     }
 
     override suspend fun getGeocodingReverse(
         lat: Double,
         lon: Double,
         limit: Int?
-    ): List<ReverseGeocodingResponse> {
-        return client.get(baseUrl) {
+    ): Flow<List<ReverseGeocodingResponse>> = executeAsFlow {
+        client.get(baseUrl) {
             url {
                 path("geo", "1.0", "reverse")
                 parameter("lat", lat)
@@ -211,7 +212,7 @@ class WeatherApiImpl(
                 if (limit != null) parameter("limit", limit)
                 parameter("appid", apiKey)
             }
-        }.body()
+        }
     }
 
     companion object {

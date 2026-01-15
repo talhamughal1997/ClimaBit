@@ -2,10 +2,11 @@ package com.talhapps.climabit.domain.repository
 
 import com.talhapps.climabit.domain.model.weather.CurrentWeatherResponse
 import com.talhapps.climabit.domain.model.weather.WeatherResponse
+import kotlinx.coroutines.flow.Flow
 
 interface WeatherRepository {
 
-    suspend fun getData(): String
+    fun getData(): Flow<String>
 
-    suspend fun getCurrentWeatherData(lat: Double, lng: Double) : CurrentWeatherResponse
+    fun getCurrentWeatherData(lat: Double, lng: Double) : Flow<CurrentWeatherResponse>
 }

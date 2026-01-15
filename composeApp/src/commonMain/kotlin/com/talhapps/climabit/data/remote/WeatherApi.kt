@@ -7,6 +7,7 @@ import com.talhapps.climabit.domain.model.weather.Forecast5Response
 import com.talhapps.climabit.domain.model.weather.GeocodingResponse
 import com.talhapps.climabit.domain.model.weather.OneCallResponse
 import com.talhapps.climabit.domain.model.weather.ReverseGeocodingResponse
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Wrapper over OpenWeather APIs.
@@ -21,18 +22,18 @@ interface WeatherApi {
      * Current weather for coordinates.
      * Uses OpenWeather "Current weather data" API: /data/2.5/weather
      */
-    suspend fun getCurrentWeatherByCoordinates(
+    fun getCurrentWeatherByCoordinates(
         lat: Double,
         lon: Double
-    ): CurrentWeatherResponse
+    ): Flow<CurrentWeatherResponse>
 
     /**
      * Current weather by city name (optionally country code, e.g. "London,GB").
      */
-    suspend fun getCurrentWeatherByCityName(
+    fun getCurrentWeatherByCityName(
         cityName: String,
         countryCode: String? = null
-    ): CurrentWeatherResponse
+    ): Flow<CurrentWeatherResponse>
 
     // --- One Call 3.0 -------------------------------------------------------
 
@@ -41,27 +42,27 @@ interface WeatherApi {
      *
      * Docs: /data/3.0/onecall
      */
-    suspend fun getOneCall(
+     fun getOneCall(
         lat: Double,
         lon: Double,
         exclude: String? = null,
         units: String? = null,
         language: String? = null
-    ): OneCallResponse
+    ): Flow<OneCallResponse>
 
     /**
      * Historical One Call data (Time Machine).
      *
      * Docs: /data/3.0/onecall/timemachine
      */
-    suspend fun getOneCallHistorical(
+     fun getOneCallHistorical(
         lat: Double,
         lon: Double,
         dt: Long,
         exclude: String? = null,
         units: String? = null,
         language: String? = null
-    ): OneCallResponse
+    ): Flow<OneCallResponse>
 
     // --- Forecasts ----------------------------------------------------------
 
@@ -69,23 +70,23 @@ interface WeatherApi {
      * 5 day / 3 hour forecast by coordinates.
      * Docs: /data/2.5/forecast
      */
-    suspend fun getFiveDayForecastByCoordinates(
+     fun getFiveDayForecastByCoordinates(
         lat: Double,
         lon: Double,
         units: String? = null,
         language: String? = null
-    ): Forecast5Response
+    ): Flow<Forecast5Response>
 
     /**
      * 16 day daily forecast by coordinates.
      * Docs: /data/2.5/forecast/daily (paid)
      */
-    suspend fun getSixteenDayForecastByCoordinates(
+     fun getSixteenDayForecastByCoordinates(
         lat: Double,
         lon: Double,
         units: String? = null,
         language: String? = null
-    ): Forecast16Response
+    ): Flow<Forecast16Response>
 
     // --- Air pollution ------------------------------------------------------
 
@@ -96,7 +97,7 @@ interface WeatherApi {
     suspend fun getCurrentAirPollution(
         lat: Double,
         lon: Double
-    ): AirPollutionResponse
+    ): Flow<AirPollutionResponse>
 
     /**
      * Air pollution forecast.
@@ -105,7 +106,7 @@ interface WeatherApi {
     suspend fun getForecastAirPollution(
         lat: Double,
         lon: Double
-    ): AirPollutionResponse
+    ): Flow<AirPollutionResponse>
 
     /**
      * Historical air pollution.
@@ -116,7 +117,7 @@ interface WeatherApi {
         lon: Double,
         start: Long,
         end: Long
-    ): AirPollutionResponse
+    ): Flow<AirPollutionResponse>
 
     // --- Geocoding ----------------------------------------------------------
 
@@ -128,7 +129,7 @@ interface WeatherApi {
         stateCode: String? = null,
         countryCode: String? = null,
         limit: Int? = null
-    ): List<GeocodingResponse>
+    ): Flow<List<GeocodingResponse>>
 
     /**
      * Reverse geocoding (coordinates -> place).
@@ -137,5 +138,5 @@ interface WeatherApi {
         lat: Double,
         lon: Double,
         limit: Int? = null
-    ): List<ReverseGeocodingResponse>
+    ): Flow<List<ReverseGeocodingResponse>>
 }
