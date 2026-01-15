@@ -48,7 +48,6 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.ktor.client.android)
             implementation(libs.kotlinx.coroutines.android)
-
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
@@ -78,7 +77,6 @@ kotlin {
             implementation(libs.coil.network.ktor)
             implementation(libs.koin.core)
             implementation(libs.koin.compose.viewmodel)
-
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
