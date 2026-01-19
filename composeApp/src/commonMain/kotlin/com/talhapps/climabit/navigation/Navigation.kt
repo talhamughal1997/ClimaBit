@@ -12,27 +12,23 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -49,13 +45,10 @@ import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import kotlinx.coroutines.CoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -68,6 +61,7 @@ import com.talhapps.climabit.presentation.details.WeatherDetailsScreen
 import com.talhapps.climabit.presentation.forecast.ForecastScreen
 import com.talhapps.climabit.presentation.search.SearchScreen
 import com.talhapps.climabit.presentation.settings.SettingsScreen
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
@@ -335,42 +329,61 @@ fun AppNavigation() {
     // Render based on navigation type
     when (navigationType) {
         NavigationType.Drawer -> {
-            ModalNavigationDrawer(drawerState = drawerState, drawerContent = {
-                navigationContent()
-            }, content = {
+            ModalNavigationDrawer(
+                drawerState = drawerState,
+                drawerContent = {
+                    ModalDrawerSheet {
+                        navigationContent()
+                    }
+                }
+            ) {
                 Scaffold(
-                    contentWindowInsets = WindowInsets(0, 0, 0, 0),
-                            topBar = {
-                        TopAppBar(title = { Text("ClimaBit") }, navigationIcon = {
-                            IconButton(onClick = { coroutineScope.launch { drawerState.open() } }) {
-                                Icon(Icons.Default.Menu, contentDescription = "Menu")
+                    topBar = {
+                        TopAppBar(
+                            title = { Text("ClimaBit") },
+                            navigationIcon = {
+                                IconButton(
+                                    onClick = {
+                                        coroutineScope.launch {
+                                            drawerState.open()
+                                        }
+                                    }
+                                ) {
+                                    Icon(
+                                        Icons.Default.Menu,
+                                        contentDescription = "Menu"
+                                    )
+                                }
                             }
-                        })
-                    }) { paddingValues ->
+                        )
+                    }
+                ) { paddingValues ->
                     Box(modifier = Modifier.padding(paddingValues)) {
                         mainContent()
                     }
                 }
-            })
+            }
         }
 
         NavigationType.Rail -> {
-            Scaffold(contentWindowInsets = WindowInsets(0, 0, 0, 0),
-                    content = { paddingValues ->
+            Scaffold(
+                content = { paddingValues ->
                     Row(modifier = Modifier.padding(paddingValues)) {
                         navigationContent()
                         Box(modifier = Modifier.weight(1f)) {
                             mainContent()
                         }
                     }
-                })
+                }
+            )
         }
 
         NavigationType.BottomBar -> {
-            Scaffold(contentWindowInsets = WindowInsets(0, 0, 0, 0),
-                    bottomBar = {
+            Scaffold(
+                bottomBar = {
                     navigationContent()
-                }) { paddingValues ->
+                }
+            ) { paddingValues ->
                 Box(modifier = Modifier.padding(paddingValues)) {
                     mainContent()
                 }
@@ -409,23 +422,32 @@ private val routeMetadataMap = mapOf<TopLevelRoute, RouteMetadata>(
  */
 @Composable
 private fun ClimaBitBottomNavigation(
-    topLevelRoutes: List<TopLevelRoute>, backStack: MutableList<Route>
+    topLevelRoutes: List<TopLevelRoute>,
+    backStack: MutableList<Route>
 ) {
-    var selectedRoute by remember { mutableStateOf<TopLevelRoute>(Dashboard) }
+    // Get current route from back stack - observe changes
+    val currentRoute = remember {
+        derivedStateOf {
+            backStack.lastOrNull() as? TopLevelRoute ?: Dashboard
+        }
+    }.value
 
     NavigationBar {
         topLevelRoutes.forEach { route ->
             val metadata = routeMetadataMap[route] ?: return@forEach
-            NavigationBarItem(icon = {
-                Icon(
-                    imageVector = metadata.icon,
-                    contentDescription = metadata.contentDescription
-                )
-            }, selected = route == selectedRoute, onClick = {
-                selectedRoute = route
-                backStack.clear()
-                backStack.add(route)
-            })
+            NavigationBarItem(
+                icon = {
+                    Icon(
+                        imageVector = metadata.icon,
+                        contentDescription = metadata.contentDescription
+                    )
+                },
+                selected = route == currentRoute,
+                onClick = {
+                    backStack.clear()
+                    backStack.add(route)
+                }
+            )
         }
     }
 }
@@ -435,23 +457,33 @@ private fun ClimaBitBottomNavigation(
  */
 @Composable
 private fun ClimaBitNavigationRail(
-    topLevelRoutes: List<TopLevelRoute>, backStack: MutableList<Route>
+    topLevelRoutes: List<TopLevelRoute>,
+    backStack: MutableList<Route>
 ) {
-    var selectedRoute by remember { mutableStateOf<TopLevelRoute>(Dashboard) }
+    // Get current route from back stack - observe changes
+    val currentRoute = remember {
+        derivedStateOf {
+            backStack.lastOrNull() as? TopLevelRoute ?: Dashboard
+        }
+    }.value
 
     NavigationRail {
         topLevelRoutes.forEach { route ->
             val metadata = routeMetadataMap[route] ?: return@forEach
-            NavigationRailItem(icon = {
-                Icon(
-                    imageVector = metadata.icon,
-                    contentDescription = metadata.contentDescription
-                )
-            }, selected = route == selectedRoute, onClick = {
-                selectedRoute = route
-                backStack.clear()
-                backStack.add(route)
-            })
+            NavigationRailItem(
+                icon = {
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        imageVector = metadata.icon,
+                        contentDescription = metadata.contentDescription
+                    )
+                },
+                selected = route == currentRoute,
+                onClick = {
+                    backStack.clear()
+                    backStack.add(route)
+                }
+            )
         }
     }
 }
@@ -466,18 +498,30 @@ private fun ClimaBitNavigationDrawer(
     topLevelRoutes: List<TopLevelRoute>,
     backStack: MutableList<Route>
 ) {
-    var selectedRoute by remember { mutableStateOf<TopLevelRoute>(Dashboard) }
+    // Get current route from back stack - observe changes
+    val currentRoute = remember {
+        derivedStateOf {
+            backStack.lastOrNull() as? TopLevelRoute ?: Dashboard
+        }
+    }.value
+    val isSettingsSelected = remember {
+        derivedStateOf {
+            backStack.lastOrNull() is Settings
+        }
+    }.value
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
         // Header
         Text(
             text = "ClimaBit",
             style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
-        Divider()
+        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
         // Top level routes
         topLevelRoutes.forEach { route ->
@@ -490,30 +534,38 @@ private fun ClimaBitNavigationDrawer(
                     )
                 },
                 label = { Text(metadata.contentDescription) },
-                selected = route == selectedRoute,
+                selected = route == currentRoute && !isSettingsSelected,
                 onClick = {
-                    selectedRoute = route
                     backStack.clear()
                     backStack.add(route)
                     coroutineScope.launch {
                         drawerState.close()
                     }
-                })
+                },
+                modifier = Modifier.padding(horizontal = 12.dp)
+            )
         }
 
-        Divider()
-        Spacer(modifier = Modifier.height(8.dp))
+        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
         // Settings
-        NavigationDrawerItem(icon = {
-            Icon(
-                imageVector = Icons.Default.Settings, contentDescription = "Settings"
-            )
-        }, label = { Text("Settings") }, selected = false, onClick = {
-            backStack.add(Settings)
-            coroutineScope.launch {
-                drawerState.close()
-            }
-        })
+        NavigationDrawerItem(
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Settings"
+                )
+            },
+            label = { Text("Settings") },
+            selected = isSettingsSelected,
+            onClick = {
+                backStack.clear()
+                backStack.add(Settings)
+                coroutineScope.launch {
+                    drawerState.close()
+                }
+            },
+            modifier = Modifier.padding(horizontal = 12.dp)
+        )
     }
 }
