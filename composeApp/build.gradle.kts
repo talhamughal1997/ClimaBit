@@ -68,6 +68,8 @@ kotlin {
             implementation(libs.navigation.compose)
             implementation(libs.lifecycle.runtime.compose)
             implementation(libs.material.icons.core)
+            implementation(libs.jetbrains.navigation3.ui)
+            implementation(libs.jetbrains.material3.adaptiveNavigation3)
 
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)

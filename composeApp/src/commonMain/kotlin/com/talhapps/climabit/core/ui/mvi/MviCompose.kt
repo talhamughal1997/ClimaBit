@@ -59,20 +59,19 @@ fun <Intent : UiIntent> sendMviIntent(
  * @param viewModel The MVI ViewModel
  * @param initialIntent Optional initial intent to send when the composable is first created
  * @param onEffect Callback to handle effects
- * @return The current UI state
+ * @return State object that can be used with property delegation
  */
 @Composable
 fun <State : UiState, Intent : UiIntent, Effect : UiEffect> useMvi(
     viewModel: MviViewModel<State, Intent, Effect>,
     initialIntent: Intent? = null,
     onEffect: (Effect) -> Unit = {}
-): State {
-    val state = collectMviState(viewModel)
+): androidx.compose.runtime.State<State> {
     handleMviEffects(viewModel, onEffect)
 
     LaunchedEffect(initialIntent) {
         initialIntent?.let { viewModel.handleIntent(it) }
     }
 
-    return state
+    return viewModel.state.collectAsState()
 }
