@@ -34,6 +34,7 @@ class WeatherApiImpl(
                 path("data", "2.5", "weather")
                 parameter("lat", lat)
                 parameter("lon", lon)
+                parameter("units", "metric")
                 parameter("appid", apiKey)
             }
         }

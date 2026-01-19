@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
@@ -35,8 +34,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.talhapps.climabit.core.ui.mvi.useMvi
 import com.talhapps.climabit.domain.model.weather.CurrentWeatherResponse
@@ -122,7 +125,8 @@ private fun DashboardContent(
                 item {
                     DashboardHeader(
                         location = state.weather?.name ?: "Loading...",
-                        country = state.weather?.sys?.country ?: "",
+                        chancesOfRain = state.weather?.main?.humidity.toString(),
+                        temperature = state.weather?.main?.temp?.toInt()?.toString() ?: "",
                         onRefresh = onRefresh,
                         isLoading = state.isLoading
                     )
@@ -176,7 +180,8 @@ private fun DashboardContent(
 @Composable
 private fun DashboardHeader(
     location: String,
-    country: String,
+    chancesOfRain: String,
+    temperature: String,
     onRefresh: () -> Unit,
     isLoading: Boolean
 ) {
@@ -187,27 +192,40 @@ private fun DashboardHeader(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Icon(
-                imageVector = Icons.Default.LocationOn,
-                contentDescription = "Location",
-                tint = MaterialTheme.colorScheme.primary
-            )
-            Column {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
                     text = location,
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Medium
                 )
-                if (country.isNotEmpty()) {
+                if (chancesOfRain.isNotEmpty()) {
                     Text(
-                        text = country,
+                        text = "Chances of rain: $chancesOfRain%",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+                Text(
+                    modifier = Modifier.padding(top = 30.dp),
+                    text = buildAnnotatedString {
+                        append(temperature)
+                        withStyle(
+                            style = SpanStyle(
+                                baselineShift = BaselineShift.Superscript,
+                                fontSize = MaterialTheme.typography.titleLarge.fontSize
+                            )
+                        ) {
+                            append("°")
+                        }
+                    },
+                    fontSize = MaterialTheme.typography.headlineLarge.fontSize,
+                    fontWeight = FontWeight.SemiBold
+                )
             }
+
+
         }
 
         IconButton(
