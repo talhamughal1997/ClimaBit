@@ -6,6 +6,7 @@ import com.talhapps.climabit.core.ui.mvi.UiEffect
 import com.talhapps.climabit.core.ui.mvi.UiIntent
 import com.talhapps.climabit.core.ui.mvi.UiState
 import com.talhapps.climabit.domain.model.weather.GeocodingResponse
+import com.talhapps.climabit.domain.usecase.weather.GetGeocodingUseCase
 import kotlinx.coroutines.launch
 
 data class SearchState(
@@ -16,16 +17,16 @@ data class SearchState(
 
 sealed interface SearchIntent : UiIntent {
     data class Search(val query: String) : SearchIntent
-    data class SelectLocation(val lat: Double, val lon: Double) : SearchIntent
+    data class SelectLocation(val location: GeocodingResponse) : SearchIntent
 }
 
 sealed interface SearchEffect : UiEffect {
-    data class NavigateToDetails(val lat: Double, val lon: Double) : SearchEffect
+    data class NavigateToDetails(val location: GeocodingResponse) : SearchEffect
     data class ShowError(val message: String) : SearchEffect
 }
 
 class SearchViewModel(
-    // private val getGeocodingUseCase: GetGeocodingUseCase
+    private val getGeocodingUseCase: GetGeocodingUseCase
 ) : MviViewModel<SearchState, SearchIntent, SearchEffect>(
     initialState = SearchState()
 ) {
@@ -39,7 +40,7 @@ class SearchViewModel(
                 }
             }
             is SearchIntent.SelectLocation -> {
-                sendEffect(SearchEffect.NavigateToDetails(intent.lat, intent.lon))
+                sendEffect(SearchEffect.NavigateToDetails(intent.location))
             }
         }
     }
@@ -47,8 +48,28 @@ class SearchViewModel(
     private fun searchLocation(query: String) {
         viewModelScope.launch {
             updateState { copy(isLoading = true, error = null) }
-            // TODO: Implement geocoding search
-            updateState { copy(isLoading = false, results = emptyList()) }
+            getGeocodingUseCase(query)
+                .observe(
+                    onLoading = { updateState { copy(isLoading = true) } },
+                    onSuccess = { results ->
+                        updateState {
+                            copy(
+                                isLoading = false,
+                                results = results,
+                                error = null
+                            )
+                        }
+                    },
+                    onError = { error ->
+                        updateState {
+                            copy(
+                                isLoading = false,
+                                error = error.message ?: "Failed to search locations"
+                            )
+                        }
+                        sendEffect(SearchEffect.ShowError(error.message ?: "Unknown error"))
+                    }
+                )
         }
     }
 }

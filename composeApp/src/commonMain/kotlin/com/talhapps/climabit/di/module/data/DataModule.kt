@@ -7,10 +7,14 @@ import com.talhapps.climabit.domain.repository.WeatherRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.logging.SIMPLE
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import kotlinx.serialization.json.Json
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.json.Json
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -37,13 +41,16 @@ val dataModule = module {
                     }
                 )
             }
+            install(Logging) {
+                logger = Logger.SIMPLE
+                level = LogLevel.ALL
+            }
         }
     }
 
     single<WeatherApi> {
         WeatherApiImpl(
-            client = get(),
-            apiKey = "3fca50336862189043dc9a14b26ba238"
+            client = get()
         )
     }
 

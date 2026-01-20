@@ -42,12 +42,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.talhapps.climabit.core.ui.mvi.useMvi
-import com.talhapps.climabit.domain.model.weather.CurrentWeatherResponse
+import com.talhapps.climabit.domain.model.weather.OpenMeteoResponse
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun DashboardScreen(
-    onLocationSelected: (Double, Double) -> Unit = { _, _ -> },
+    onLocationSelected: (Double, Double, String?, String?) -> Unit = { _, _, _, _ -> },
     onSettingsClick: () -> Unit = {},
     viewModel: DashboardViewModel = koinViewModel()
 ) {
@@ -75,8 +75,12 @@ fun DashboardScreen(
         state = state,
         onRefresh = { viewModel.handleIntent(DashboardIntent.RefreshWeather) },
         onLocationClick = {
-            state.weather?.coord?.let { coord ->
-                onLocationSelected(coord.lat ?: 0.0, coord.lon ?: 0.0)
+            state.weather?.let { weather ->
+                val lat = weather.latitude ?: 0.0
+                val lon = weather.longitude ?: 0.0
+                val locationName = state.location?.name
+                val locationCountry = state.location?.country
+                onLocationSelected(lat, lon, locationName, locationCountry)
             }
         },
         onSettingsClick = { viewModel.handleIntent(DashboardIntent.NavigateToSettings) }
@@ -123,10 +127,18 @@ private fun DashboardContent(
             ) {
                 // Header
                 item {
+                    val locationName = state.location?.name
+//                        ?: "${state.weather?.latitude?.let { "%.2f".format(it) }}, ${state.weather?.longitude?.let { "%.2f".format(it) }}"
+                        ?: "Current Location"
+                    val precipitationProb =
+                        state.oneCallData?.hourly?.precipitationProbability?.firstOrNull()?.let {
+                            it
+                        } ?: 0
                     DashboardHeader(
-                        location = state.weather?.name ?: "Loading...",
-                        chancesOfRain = state.weather?.main?.humidity.toString(),
-                        temperature = state.weather?.main?.temp?.toInt()?.toString() ?: "",
+                        location = locationName,
+                        chancesOfRain = if (precipitationProb > 0) precipitationProb.toString() else "",
+                        temperature = state.weather?.current?.temperature2m?.toInt()?.toString()
+                            ?: "",
                         onRefresh = onRefresh,
                         isLoading = state.isLoading
                     )
@@ -159,6 +171,18 @@ private fun DashboardContent(
                             weather = weather,
                             onClick = onLocationClick
                         )
+                    }
+
+                    // Today's Forecast Section
+                    state.oneCallData?.hourly?.let { hourlyData ->
+                        item {
+                            TodayForecastSection(
+                                hourlyData = hourlyData,
+                                timezoneOffset = state.oneCallData.utcOffsetSeconds,
+                                timezone = state.oneCallData.timezone,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+                        }
                     }
 
                     // Weather Details Grid
@@ -250,7 +274,7 @@ private fun DashboardHeader(
 
 @Composable
 private fun MainWeatherCard(
-    weather: CurrentWeatherResponse,
+    weather: OpenMeteoResponse,
     onClick: () -> Unit = {}
 ) {
     Card(
@@ -267,19 +291,19 @@ private fun MainWeatherCard(
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Weather Icon/Description
-            weather.weather.firstOrNull()?.let { weatherInfo ->
-                Text(
-                    text = weatherInfo.description?.replaceFirstChar { it.uppercase() } ?: "",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            }
+            // Weather Description (using weather code)
+            val weatherCode = weather.current?.weatherCode
+            val weatherDescription = getWeatherDescription(weatherCode)
+            Text(
+                text = weatherDescription,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Temperature
-            weather.main?.temp?.let { temp ->
+            weather.current?.temperature2m?.let { temp ->
                 Text(
                     text = "${temp.toInt()}°",
                     style = MaterialTheme.typography.displayLarge,
@@ -291,41 +315,19 @@ private fun MainWeatherCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             // Feels Like
-            weather.main?.feelsLike?.let { feelsLike ->
+            weather.current?.apparentTemperature?.let { feelsLike ->
                 Text(
                     text = "Feels like ${feelsLike.toInt()}°",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                 )
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Min/Max Temperature
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                weather.main?.tempMin?.let { min ->
-                    Text(
-                        text = "↓ ${min.toInt()}°",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-                    )
-                }
-                weather.main?.tempMax?.let { max ->
-                    Text(
-                        text = "↑ ${max.toInt()}°",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-                    )
-                }
-            }
         }
     }
 }
 
 @Composable
-private fun WeatherDetailsGrid(weather: CurrentWeatherResponse) {
+private fun WeatherDetailsGrid(weather: OpenMeteoResponse) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -337,14 +339,14 @@ private fun WeatherDetailsGrid(weather: CurrentWeatherResponse) {
             WeatherDetailCard(
                 modifier = Modifier.weight(1f),
                 title = "Humidity",
-                value = "${weather.main?.humidity ?: 0}%"
+                value = "${weather.current?.relativeHumidity2m ?: 0}%"
             )
 
             // Pressure
             WeatherDetailCard(
                 modifier = Modifier.weight(1f),
                 title = "Pressure",
-                value = "${weather.main?.pressure ?: 0} hPa"
+                value = "${weather.current?.pressureMsl?.toInt() ?: 0} hPa"
             )
         }
 
@@ -356,14 +358,14 @@ private fun WeatherDetailsGrid(weather: CurrentWeatherResponse) {
             WeatherDetailCard(
                 modifier = Modifier.weight(1f),
                 title = "Wind Speed",
-                value = "${weather.wind?.speed ?: 0.0} m/s"
+                value = "${weather.current?.windSpeed10m ?: 0.0} km/h"
             )
 
-            // Visibility
+            // Wind Direction
             WeatherDetailCard(
                 modifier = Modifier.weight(1f),
-                title = "Visibility",
-                value = "${(weather.visibility ?: 0) / 1000} km"
+                title = "Wind Direction",
+                value = "${weather.current?.windDirection10m ?: 0}°"
             )
         }
     }
@@ -406,7 +408,7 @@ private fun WeatherDetailCard(
 }
 
 @Composable
-private fun AdditionalInfoCard(weather: CurrentWeatherResponse) {
+private fun AdditionalInfoCard(weather: OpenMeteoResponse) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -429,7 +431,7 @@ private fun AdditionalInfoCard(weather: CurrentWeatherResponse) {
             Divider()
 
             // Cloud Coverage
-            weather.clouds?.all?.let { clouds ->
+            weather.current?.cloudCover?.let { clouds ->
                 InfoRow(
                     label = "Cloud Coverage",
                     value = "$clouds%"
@@ -437,7 +439,7 @@ private fun AdditionalInfoCard(weather: CurrentWeatherResponse) {
             }
 
             // Wind Direction
-            weather.wind?.deg?.let { deg ->
+            weather.current?.windDirection10m?.let { deg ->
                 InfoRow(
                     label = "Wind Direction",
                     value = "${deg}°"
@@ -445,10 +447,10 @@ private fun AdditionalInfoCard(weather: CurrentWeatherResponse) {
             }
 
             // Wind Gust
-            weather.wind?.gust?.let { gust ->
+            weather.current?.windGusts10m?.let { gust ->
                 InfoRow(
                     label = "Wind Gust",
-                    value = "$gust m/s"
+                    value = "$gust km/h"
                 )
             }
         }

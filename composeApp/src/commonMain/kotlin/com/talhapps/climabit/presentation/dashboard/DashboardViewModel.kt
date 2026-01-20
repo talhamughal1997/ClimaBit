@@ -5,9 +5,12 @@ import com.talhapps.climabit.core.ui.mvi.MviViewModel
 import com.talhapps.climabit.core.ui.mvi.UiEffect
 import com.talhapps.climabit.core.ui.mvi.UiIntent
 import com.talhapps.climabit.core.ui.mvi.UiState
-import com.talhapps.climabit.domain.model.weather.CurrentWeatherResponse
+import com.talhapps.climabit.domain.model.weather.GeocodingResponse
+import com.talhapps.climabit.domain.model.weather.OpenMeteoResponse
 import com.talhapps.climabit.domain.model.weather.WeatherRequest
 import com.talhapps.climabit.domain.usecase.weather.GetCurrentWeatherDataUseCase
+import com.talhapps.climabit.domain.usecase.weather.GetOneCallUseCase
+import com.talhapps.climabit.domain.usecase.weather.GetReverseGeocodingUseCase
 import kotlinx.coroutines.launch
 
 /**
@@ -15,7 +18,9 @@ import kotlinx.coroutines.launch
  */
 data class DashboardState(
     val isLoading: Boolean = false,
-    val weather: CurrentWeatherResponse? = null,
+    val weather: OpenMeteoResponse? = null,
+    val oneCallData: OpenMeteoResponse? = null,
+    val location: GeocodingResponse? = null,
     val error: String? = null
 ) : UiState
 
@@ -42,7 +47,9 @@ sealed interface DashboardEffect : UiEffect {
  * Dashboard ViewModel using MVI architecture
  */
 class DashboardViewModel(
-    private val getCurrentWeatherDataUseCase: GetCurrentWeatherDataUseCase
+    private val getCurrentWeatherDataUseCase: GetCurrentWeatherDataUseCase,
+    private val getOneCallUseCase: GetOneCallUseCase,
+    private val getReverseGeocodingUseCase: GetReverseGeocodingUseCase
 ) : MviViewModel<DashboardState, DashboardIntent, DashboardEffect>(
     initialState = DashboardState()
 ) {
@@ -59,9 +66,12 @@ class DashboardViewModel(
             }
 
             is DashboardIntent.RefreshWeather -> {
-                val currentLocation = currentState.weather?.coord
+                val currentLocation = currentState.weather
                 if (currentLocation != null) {
-                    loadWeather(currentLocation.lat ?: 24.8607, currentLocation.lon ?: 67.0011)
+                    loadWeather(
+                        currentLocation.latitude ?: 24.8607,
+                        currentLocation.longitude ?: 67.0011
+                    )
                 } else {
                     loadWeather(24.8607, 67.0011)
                 }
@@ -81,6 +91,7 @@ class DashboardViewModel(
         viewModelScope.launch {
             updateState { copy(isLoading = true, error = null) }
 
+            // Load current weather
             getCurrentWeatherDataUseCase(WeatherRequest(lat = lat, lng = lon))
                 .observe(
                     onLoading = { updateState { copy(isLoading = true) } },
@@ -101,6 +112,32 @@ class DashboardViewModel(
                             )
                         }
                         sendEffect(DashboardEffect.ShowError(error.message ?: "Unknown error"))
+                    }
+                )
+
+            // Load OneCall data for hourly forecast
+            getOneCallUseCase(WeatherRequest(lat = lat, lng = lon))
+                .observe(
+                    onLoading = {},
+                    onSuccess = { oneCall ->
+                        updateState {
+                            copy(oneCallData = oneCall)
+                        }
+                    },
+                    onError = {
+                        // Don't show error for OneCall, just log it
+                    }
+                )
+
+            // Load location name
+            getReverseGeocodingUseCase(WeatherRequest(lat = lat, lng = lon))
+                .observe(
+                    onLoading = {},
+                    onSuccess = { location ->
+                        updateState { copy(location = location) }
+                    },
+                    onError = {
+                        // Don't show error for geocoding
                     }
                 )
         }

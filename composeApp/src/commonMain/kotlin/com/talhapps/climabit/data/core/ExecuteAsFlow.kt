@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.flow
  * @example
  * ```
  * // In WeatherApiImpl:
- * fun getCurrentWeather(...): Flow<CurrentWeatherResponse> {
+ * fun getCurrentWeather(...): Flow<OpenMeteoResponse> {
  *     return executeAsFlow {
  *         client.get(baseUrl) {
  *             url {

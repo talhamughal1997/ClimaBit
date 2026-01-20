@@ -1,142 +1,139 @@
 package com.talhapps.climabit.data.remote
 
-import com.talhapps.climabit.domain.model.weather.AirPollutionResponse
-import com.talhapps.climabit.domain.model.weather.CurrentWeatherResponse
-import com.talhapps.climabit.domain.model.weather.Forecast16Response
-import com.talhapps.climabit.domain.model.weather.Forecast5Response
+import com.talhapps.climabit.domain.model.weather.AirQualityResponse
 import com.talhapps.climabit.domain.model.weather.GeocodingResponse
-import com.talhapps.climabit.domain.model.weather.OneCallResponse
-import com.talhapps.climabit.domain.model.weather.ReverseGeocodingResponse
+import com.talhapps.climabit.domain.model.weather.HistoricalWeatherResponse
+import com.talhapps.climabit.domain.model.weather.OpenMeteoResponse
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Wrapper over OpenWeather APIs.
+ * Wrapper over Open-Meteo APIs.
  *
- * Docs: see [https://openweathermap.org/api](https://openweathermap.org/api)
+ * Docs: https://open-meteo.com/en/docs
  */
 interface WeatherApi {
 
-    // --- Current weather ----------------------------------------------------
+    // --- Weather Forecast API ---
 
     /**
-     * Current weather for coordinates.
-     * Uses OpenWeather "Current weather data" API: /data/2.5/weather
+     * Get current weather for coordinates.
+     * Returns current weather data.
+     *
+     * @param lat Latitude
+     * @param lon Longitude
+     * @param timezone Timezone (e.g., "auto" or "Europe/Berlin"). Defaults to "auto"
+     * @return OpenMeteoResponse with current weather data
      */
     fun getCurrentWeatherByCoordinates(
         lat: Double,
-        lon: Double
-    ): Flow<CurrentWeatherResponse>
+        lon: Double,
+        timezone: String = "auto"
+    ): Flow<OpenMeteoResponse>
 
     /**
-     * Current weather by city name (optionally country code, e.g. "London,GB").
-     */
-    fun getCurrentWeatherByCityName(
-        cityName: String,
-        countryCode: String? = null
-    ): Flow<CurrentWeatherResponse>
-
-    // --- One Call 3.0 -------------------------------------------------------
-
-    /**
-     * One Call 3.0 – current + hourly + daily forecast in a single response.
+     * Get comprehensive forecast data (current + hourly + daily).
+     * Returns OpenMeteoResponse with hourly and daily forecasts.
      *
-     * Docs: /data/3.0/onecall
+     * @param lat Latitude
+     * @param lon Longitude
+     * @param timezone Timezone (e.g., "auto" or "Europe/Berlin"). Defaults to "auto"
+     * @param forecastDays Number of forecast days (1-16). Defaults to 7
+     * @return OpenMeteoResponse with current, hourly, and daily forecast data
      */
-     fun getOneCall(
+    fun getOneCall(
         lat: Double,
         lon: Double,
-        exclude: String? = null,
-        units: String? = null,
-        language: String? = null
-    ): Flow<OneCallResponse>
+        timezone: String = "auto",
+        forecastDays: Int = 7
+    ): Flow<OpenMeteoResponse>
+
+    // --- Historical Weather API ---
 
     /**
-     * Historical One Call data (Time Machine).
+     * Get historical weather data for a specific date range.
+     * Docs: https://open-meteo.com/en/docs/historical-weather-api
      *
-     * Docs: /data/3.0/onecall/timemachine
+     * @param lat Latitude
+     * @param lon Longitude
+     * @param startDate Start date in YYYY-MM-DD format
+     * @param endDate End date in YYYY-MM-DD format
+     * @param timezone Timezone (e.g., "auto" or "Europe/Berlin"). Defaults to "auto"
+     * @return HistoricalWeatherResponse with historical weather data
      */
-     fun getOneCallHistorical(
+    fun getHistoricalWeather(
         lat: Double,
         lon: Double,
-        dt: Long,
-        exclude: String? = null,
-        units: String? = null,
-        language: String? = null
-    ): Flow<OneCallResponse>
+        startDate: String,
+        endDate: String,
+        timezone: String = "auto"
+    ): Flow<HistoricalWeatherResponse>
 
-    // --- Forecasts ----------------------------------------------------------
+    // --- Air Quality API ---
 
     /**
-     * 5 day / 3 hour forecast by coordinates.
-     * Docs: /data/2.5/forecast
+     * Get current air quality data.
+     * Docs: https://open-meteo.com/en/docs/air-quality-api
+     *
+     * @param lat Latitude
+     * @param lon Longitude
+     * @param timezone Timezone (e.g., "auto" or "Europe/Berlin"). Defaults to "auto"
+     * @return AirQualityResponse with current air quality data
      */
-     fun getFiveDayForecastByCoordinates(
+    fun getCurrentAirQuality(
         lat: Double,
         lon: Double,
-        units: String? = null,
-        language: String? = null
-    ): Flow<Forecast5Response>
+        timezone: String = "auto"
+    ): Flow<AirQualityResponse>
 
     /**
-     * 16 day daily forecast by coordinates.
-     * Docs: /data/2.5/forecast/daily (paid)
+     * Get air quality forecast (hourly and daily).
+     *
+     * @param lat Latitude
+     * @param lon Longitude
+     * @param timezone Timezone (e.g., "auto" or "Europe/Berlin"). Defaults to "auto"
+     * @param forecastDays Number of forecast days (1-7). Defaults to 3
+     * @return AirQualityResponse with air quality forecast
      */
-     fun getSixteenDayForecastByCoordinates(
+    fun getAirQualityForecast(
         lat: Double,
         lon: Double,
-        units: String? = null,
-        language: String? = null
-    ): Flow<Forecast16Response>
+        timezone: String = "auto",
+        forecastDays: Int = 3
+    ): Flow<AirQualityResponse>
 
-    // --- Air pollution ------------------------------------------------------
-
-    /**
-     * Current air pollution data.
-     * Docs: /data/2.5/air_pollution
-     */
-    suspend fun getCurrentAirPollution(
-        lat: Double,
-        lon: Double
-    ): Flow<AirPollutionResponse>
+    // --- Geocoding API ---
 
     /**
-     * Air pollution forecast.
-     * Docs: /data/2.5/air_pollution/forecast
+     * Direct geocoding - search for locations by name.
+     * Docs: https://open-meteo.com/en/docs/geocoding-api
+     *
+     * @param name Location name (e.g., "London", "New York")
+     * @param count Maximum number of results (1-100). Defaults to 10
+     * @param language Language code (e.g., "en", "de"). Defaults to "en"
+     * @param format Response format ("json" or "geojson"). Defaults to "json"
+     * @return List of GeocodingResponse matching the search query
      */
-    suspend fun getForecastAirPollution(
-        lat: Double,
-        lon: Double
-    ): Flow<AirPollutionResponse>
-
-    /**
-     * Historical air pollution.
-     * Docs: /data/2.5/air_pollution/history
-     */
-    suspend fun getHistoricalAirPollution(
-        lat: Double,
-        lon: Double,
-        start: Long,
-        end: Long
-    ): Flow<AirPollutionResponse>
-
-    // --- Geocoding ----------------------------------------------------------
-
-    /**
-     * Direct geocoding (city name -> coordinates).
-     */
-    suspend fun getGeocodingDirect(
-        cityName: String,
-        stateCode: String? = null,
-        countryCode: String? = null,
-        limit: Int? = null
+    fun searchLocations(
+        name: String,
+        count: Int = 10,
+        language: String = "en",
+        format: String = "json"
     ): Flow<List<GeocodingResponse>>
 
     /**
-     * Reverse geocoding (coordinates -> place).
+     * Get location name from coordinates using search API.
+     * Uses the search API with latitude/longitude parameters to find nearby locations.
+     *
+     * @param lat Latitude
+     * @param lon Longitude
+     * @param count Number of results (1-100). Defaults to 1
+     * @param language Language code (e.g., "en", "de"). Defaults to "en"
+     * @return GeocodingResponse with location information (first result)
      */
-    suspend fun getGeocodingReverse(
+    fun getLocationByCoordinates(
         lat: Double,
         lon: Double,
-        limit: Int? = null
-    ): Flow<List<ReverseGeocodingResponse>>
+        count: Int = 1,
+        language: String = "en"
+    ): Flow<GeocodingResponse?>
 }

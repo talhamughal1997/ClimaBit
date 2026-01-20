@@ -1,14 +1,28 @@
 package com.talhapps.climabit.presentation.search
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,7 +38,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
-    onLocationSelected: (Double, Double) -> Unit = { _, _ -> },
+    onLocationSelected: (com.talhapps.climabit.domain.model.weather.GeocodingResponse) -> Unit = { },
     viewModel: SearchViewModel = koinViewModel()
 ) {
     var searchQuery by remember { mutableStateOf("") }
@@ -33,7 +47,7 @@ fun SearchScreen(
         onEffect = { effect ->
             when (effect) {
                 is SearchEffect.NavigateToDetails -> {
-                    onLocationSelected(effect.lat, effect.lon)
+                    onLocationSelected(effect.location)
                 }
                 is SearchEffect.ShowError -> {
                     // Handle error
@@ -89,7 +103,7 @@ fun SearchScreen(
                             location = location,
                             onClick = {
                                 viewModel.handleIntent(
-                                    SearchIntent.SelectLocation(location.lat ?: 0.0, location.lon ?: 0.0)
+                                    SearchIntent.SelectLocation(location)
                                 )
                             }
                         )
@@ -122,11 +136,25 @@ private fun LocationItemCard(
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
-                location.country?.let { country ->
+                val locationDetails = buildString {
+                    location.admin1?.let { append(it) }
+                    location.country?.let {
+                        if (isNotEmpty()) append(", ")
+                        append(it)
+                    }
+                }
+                if (locationDetails.isNotEmpty()) {
                     Text(
-                        text = country,
+                        text = locationDetails,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                location.featureCode?.let { featureCode ->
+                    Text(
+                        text = featureCode,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                     )
                 }
             }

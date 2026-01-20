@@ -5,17 +5,34 @@ import com.talhapps.climabit.core.ui.mvi.MviViewModel
 import com.talhapps.climabit.core.ui.mvi.UiEffect
 import com.talhapps.climabit.core.ui.mvi.UiIntent
 import com.talhapps.climabit.core.ui.mvi.UiState
-import com.talhapps.climabit.domain.model.weather.CurrentWeatherResponse
+import com.talhapps.climabit.domain.model.weather.AirQualityResponse
+import com.talhapps.climabit.domain.model.weather.GeocodingResponse
+import com.talhapps.climabit.domain.model.weather.OpenMeteoResponse
+import com.talhapps.climabit.domain.model.weather.WeatherRequest
+import com.talhapps.climabit.domain.usecase.weather.GetAirQualityUseCase
+import com.talhapps.climabit.domain.usecase.weather.GetOneCallUseCase
+import com.talhapps.climabit.domain.usecase.weather.GetReverseGeocodingUseCase
 import kotlinx.coroutines.launch
 
 data class WeatherDetailsState(
     val isLoading: Boolean = false,
-    val weather: CurrentWeatherResponse? = null,
+    val isLoadingWeather: Boolean = false,
+    val isLoadingAirQuality: Boolean = false,
+    val weather: OpenMeteoResponse? = null,
+    val airQuality: AirQualityResponse? = null,
+    val location: GeocodingResponse? = null,
     val error: String? = null
-) : UiState
+) : UiState {
+    val isAnyLoading: Boolean
+        get() = isLoading || isLoadingWeather || isLoadingAirQuality
+}
 
 sealed interface WeatherDetailsIntent : UiIntent {
-    data class LoadDetails(val lat: Double, val lon: Double) : WeatherDetailsIntent
+    data class LoadDetails(
+        val lat: Double,
+        val lon: Double,
+        val location: GeocodingResponse? = null
+    ) : WeatherDetailsIntent
 }
 
 sealed interface WeatherDetailsEffect : UiEffect {
@@ -23,23 +40,104 @@ sealed interface WeatherDetailsEffect : UiEffect {
 }
 
 class WeatherDetailsViewModel(
-    // private val getWeatherUseCase: GetCurrentWeatherDataUseCase
+    private val getOneCallUseCase: GetOneCallUseCase,
+    private val getAirQualityUseCase: GetAirQualityUseCase,
+    private val getReverseGeocodingUseCase: GetReverseGeocodingUseCase
 ) : MviViewModel<WeatherDetailsState, WeatherDetailsIntent, WeatherDetailsEffect>(
     initialState = WeatherDetailsState()
 ) {
     override fun onIntent(intent: WeatherDetailsIntent) {
         when (intent) {
             is WeatherDetailsIntent.LoadDetails -> {
-                loadDetails(intent.lat, intent.lon)
+                loadDetails(intent.lat, intent.lon, intent.location)
             }
         }
     }
 
-    private fun loadDetails(lat: Double, lon: Double) {
+    private fun loadDetails(lat: Double, lon: Double, location: GeocodingResponse?) {
         viewModelScope.launch {
-            updateState { copy(isLoading = true, error = null) }
-            // TODO: Implement weather details loading
-            updateState { copy(isLoading = false) }
+            // Set location immediately if provided (from search)
+            if (location != null) {
+                updateState { copy(location = location) }
+            }
+
+            updateState {
+                copy(
+                    isLoading = true,
+                    isLoadingWeather = true,
+                    isLoadingAirQuality = true,
+                    error = null
+                )
+            }
+
+            var weatherLoaded = false
+            var airQualityLoaded = false
+
+            // Load weather forecast
+            getOneCallUseCase(WeatherRequest(lat = lat, lng = lon))
+                .observe(
+                    onLoading = { updateState { copy(isLoadingWeather = true) } },
+                    onSuccess = { weather ->
+                        weatherLoaded = true
+                        updateState {
+                            copy(
+                                weather = weather,
+                                isLoadingWeather = false,
+                                isLoading = !airQualityLoaded
+                            )
+                        }
+                    },
+                    onError = { error ->
+                        weatherLoaded = true
+                        updateState {
+                            copy(
+                                isLoading = !airQualityLoaded,
+                                isLoadingWeather = false,
+                                error = error.message ?: "Failed to load weather data"
+                            )
+                        }
+                        sendEffect(WeatherDetailsEffect.ShowError(error.message ?: "Unknown error"))
+                    }
+                )
+
+            // Load air quality
+            getAirQualityUseCase(WeatherRequest(lat = lat, lng = lon))
+                .observe(
+                    onLoading = { updateState { copy(isLoadingAirQuality = true) } },
+                    onSuccess = { airQuality ->
+                        airQualityLoaded = true
+                        updateState {
+                            copy(
+                                airQuality = airQuality,
+                                isLoadingAirQuality = false,
+                                isLoading = !weatherLoaded
+                            )
+                        }
+                    },
+                    onError = {
+                        airQualityLoaded = true
+                        updateState {
+                            copy(
+                                isLoadingAirQuality = false,
+                                isLoading = !weatherLoaded
+                            )
+                        }
+                    }
+                )
+
+            // Load location name only if not provided from search
+            if (location == null) {
+                getReverseGeocodingUseCase(WeatherRequest(lat = lat, lng = lon))
+                    .observe(
+                        onLoading = {},
+                        onSuccess = { fetchedLocation ->
+                            updateState { copy(location = fetchedLocation) }
+                        },
+                        onError = {
+                            // Don't show error for geocoding
+                        }
+                    )
+            }
         }
     }
 }

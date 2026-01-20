@@ -1,13 +1,24 @@
 package com.talhapps.climabit.presentation.forecast
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -19,7 +30,7 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun ForecastScreen(
-    onForecastItemSelected: (Double, Double) -> Unit = { _, _ -> },
+    onForecastItemSelected: (Double, Double, String?, String?) -> Unit = { _, _, _, _ -> },
     viewModel: ForecastViewModel = koinViewModel()
 ) {
     val state by useMvi(
@@ -30,17 +41,25 @@ fun ForecastScreen(
                 is ForecastEffect.ShowError -> {
                     // Handle error
                 }
+                is ForecastEffect.NavigateToDetails -> {
+                    onForecastItemSelected(
+                        effect.lat,
+                        effect.lon,
+                        effect.location?.name,
+                        effect.location?.country
+                    )
+                }
             }
         }
     )
 
     ForecastListPane(
         state = state,
-        onItemClick = { item ->
-            // Use forecast city coordinates or default location
-            val lat = state.forecast?.city?.let { 24.8607 } ?: 24.8607
-            val lon = state.forecast?.city?.let { 67.0011 } ?: 67.0011
-            onForecastItemSelected(lat, lon)
+        onItemClick = { index ->
+            // Use forecast coordinates or default location
+            val lat = state.forecast?.latitude ?: 24.8607
+            val lon = state.forecast?.longitude ?: 67.0011
+            viewModel.handleIntent(ForecastIntent.SelectForecastItem(lat, lon))
         }
     )
 }
@@ -49,7 +68,7 @@ fun ForecastScreen(
 @Composable
 private fun ForecastListPane(
     state: ForecastState,
-    onItemClick: (com.talhapps.climabit.domain.model.weather.Forecast5Response.ForecastItem) -> Unit
+    onItemClick: (Int) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -76,11 +95,14 @@ private fun ForecastListPane(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                state.forecast?.list?.let { forecastList ->
-                    items(forecastList) { item ->
+                state.forecast?.daily?.let { dailyData ->
+                    itemsIndexed(dailyData.time) { index, timeStr ->
                         ForecastItemCard(
-                            forecastItem = item,
-                            onClick = { onItemClick(item) }
+                            timeStr = timeStr,
+                            maxTemp = dailyData.temperature2mMax.getOrNull(index),
+                            minTemp = dailyData.temperature2mMin.getOrNull(index),
+                            weatherCode = dailyData.weatherCode.getOrNull(index),
+                            onClick = { onItemClick(index) }
                         )
                     }
                 }
@@ -91,9 +113,34 @@ private fun ForecastListPane(
 
 @Composable
 private fun ForecastItemCard(
-    forecastItem: com.talhapps.climabit.domain.model.weather.Forecast5Response.ForecastItem,
+    timeStr: String,
+    maxTemp: Double?,
+    minTemp: Double?,
+    weatherCode: Int?,
     onClick: () -> Unit
 ) {
+    val dateDisplay = try {
+        // Parse ISO8601 format: "2022-07-01"
+        timeStr
+    } catch (e: Exception) {
+        timeStr
+    }
+
+    val weatherDescription = when (weatherCode) {
+        0 -> "Clear sky"
+        1 -> "Mainly clear"
+        2 -> "Partly cloudy"
+        3 -> "Overcast"
+        45, 48 -> "Fog"
+        in 51..57 -> "Drizzle"
+        in 61..67 -> "Rain"
+        in 71..77 -> "Snow"
+        in 80..82 -> "Rain showers"
+        in 85..86 -> "Snow showers"
+        95, 96, 99 -> "Thunderstorm"
+        else -> "Unknown"
+    }
+    
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -108,23 +155,30 @@ private fun ForecastItemCard(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = forecastItem.dtTxt ?: "",
+                    text = dateDisplay,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
-                forecastItem.weather.firstOrNull()?.let { weather ->
+                Text(
+                    text = weatherDescription,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                minTemp?.let { min ->
                     Text(
-                        text = weather.description?.replaceFirstChar { it.uppercase() } ?: "",
-                        style = MaterialTheme.typography.bodyMedium
+                        text = "${min.toInt()}°",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-            }
-            forecastItem.main?.let { main ->
-                Text(
-                    text = "${main.temp?.toInt() ?: 0}°",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
-                )
+                maxTemp?.let { max ->
+                    Text(
+                        text = "${max.toInt()}°",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
     }

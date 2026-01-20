@@ -105,7 +105,12 @@ private data object Settings : Route
  * Weather details route with location parameters.
  */
 @Serializable
-private data class WeatherDetails(val lat: Double, val lon: Double) : Route
+private data class WeatherDetails(
+    val lat: Double,
+    val lon: Double,
+    val locationName: String? = null,
+    val locationCountry: String? = null
+) : Route
 
 /**
  * List of top level routes for navigation bar.
@@ -274,8 +279,15 @@ fun AppNavigation() {
                             )
                         }
                     })) {
-                    DashboardScreen(onLocationSelected = { lat, lon ->
-                        backStack.add(WeatherDetails(lat, lon))
+                    DashboardScreen(onLocationSelected = { lat, lon, locationName, locationCountry ->
+                        backStack.add(
+                            WeatherDetails(
+                                lat = lat,
+                                lon = lon,
+                                locationName = locationName,
+                                locationCountry = locationCountry
+                            )
+                        )
                     }, onSettingsClick = {
                         backStack.add(Settings)
                     })
@@ -297,16 +309,30 @@ fun AppNavigation() {
                         }
                     })) {
                     ForecastScreen(
-                        onForecastItemSelected = { lat, lon ->
-                            backStack.add(WeatherDetails(lat, lon))
+                        onForecastItemSelected = { lat, lon, locationName, locationCountry ->
+                            backStack.add(
+                                WeatherDetails(
+                                    lat = lat,
+                                    lon = lon,
+                                    locationName = locationName,
+                                    locationCountry = locationCountry
+                                )
+                            )
                         })
                 }
 
                 // Search entry
                 entry<Search> {
                     SearchScreen(
-                        onLocationSelected = { lat, lon ->
-                            backStack.add(WeatherDetails(lat, lon))
+                        onLocationSelected = { location ->
+                            backStack.add(
+                                WeatherDetails(
+                                    lat = location.latitude ?: 0.0,
+                                    lon = location.longitude ?: 0.0,
+                                    locationName = location.name,
+                                    locationCountry = location.country
+                                )
+                            )
                         })
                 }
 
@@ -320,7 +346,10 @@ fun AppNavigation() {
                     metadata = ListDetailSceneStrategy.detailPane()
                 ) { key ->
                     WeatherDetailsScreen(
-                        lat = key.lat, lon = key.lon
+                        lat = key.lat,
+                        lon = key.lon,
+                        locationName = key.locationName,
+                        locationCountry = key.locationCountry
                     )
                 }
             })
@@ -384,7 +413,7 @@ fun AppNavigation() {
                     navigationContent()
                 }
             ) { paddingValues ->
-                Box(modifier = Modifier.padding(paddingValues)) {
+                Box {
                     mainContent()
                 }
             }

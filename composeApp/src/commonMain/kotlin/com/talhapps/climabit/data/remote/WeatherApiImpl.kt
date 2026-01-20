@@ -1,55 +1,46 @@
 package com.talhapps.climabit.data.remote
 
 import com.talhapps.climabit.data.core.executeAsFlow
-import com.talhapps.climabit.domain.model.weather.AirPollutionResponse
-import com.talhapps.climabit.domain.model.weather.CurrentWeatherResponse
-import com.talhapps.climabit.domain.model.weather.Forecast16Response
-import com.talhapps.climabit.domain.model.weather.Forecast5Response
+import com.talhapps.climabit.domain.model.weather.AirQualityResponse
+import com.talhapps.climabit.domain.model.weather.GeocodingApiResponse
 import com.talhapps.climabit.domain.model.weather.GeocodingResponse
-import com.talhapps.climabit.domain.model.weather.OneCallResponse
-import com.talhapps.climabit.domain.model.weather.ReverseGeocodingResponse
+import com.talhapps.climabit.domain.model.weather.HistoricalWeatherResponse
+import com.talhapps.climabit.domain.model.weather.OpenMeteoResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.http.path
+import io.ktor.http.takeFrom
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 /**
- * Default implementation backed by OpenWeather APIs.
+ * Implementation backed by Open-Meteo Weather Forecast API.
  *
- * Base docs: [https://openweathermap.org/api](https://openweathermap.org/api)
+ * Base docs: https://open-meteo.com/en/docs
  */
 class WeatherApiImpl(
     private val client: HttpClient,
-    private val apiKey: String,
     private val baseUrl: String = DEFAULT_BASE_URL
 ) : WeatherApi {
 
     override fun getCurrentWeatherByCoordinates(
         lat: Double,
-        lon: Double
-    ): Flow<CurrentWeatherResponse> = executeAsFlow {
-        client.get(baseUrl) {
+        lon: Double,
+        timezone: String
+    ): Flow<OpenMeteoResponse> = executeAsFlow {
+        client.get {
             url {
-                path("data", "2.5", "weather")
-                parameter("lat", lat)
-                parameter("lon", lon)
-                parameter("units", "metric")
-                parameter("appid", apiKey)
-            }
-        }
-    }
-
-    override fun getCurrentWeatherByCityName(
-        cityName: String,
-        countryCode: String?
-    ): Flow<CurrentWeatherResponse> = executeAsFlow {
-        val q = if (countryCode.isNullOrBlank()) cityName else "$cityName,$countryCode"
-        client.get(baseUrl) {
-            url {
-                path("data", "2.5", "weather")
-                parameter("q", q)
-                parameter("appid", apiKey)
+                takeFrom(baseUrl)
+                path("v1", "forecast")
+                parameter("latitude", lat)
+                parameter("longitude", lon)
+                parameter("timezone", timezone)
+                // Current weather variables
+                parameter(
+                    "current",
+                    "temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,rain,showers,snowfall,weather_code,cloud_cover,pressure_msl,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m"
+                )
             }
         }
     }
@@ -57,166 +48,155 @@ class WeatherApiImpl(
     override fun getOneCall(
         lat: Double,
         lon: Double,
-        exclude: String?,
-        units: String?,
-        language: String?
-    ): Flow<OneCallResponse> = executeAsFlow {
-        client.get(baseUrl) {
+        timezone: String,
+        forecastDays: Int
+    ): Flow<OpenMeteoResponse> = executeAsFlow {
+        client.get {
             url {
-                path("data", "3.0", "onecall")
-                parameter("lat", lat)
-                parameter("lon", lon)
-                if (!exclude.isNullOrBlank()) parameter("exclude", exclude)
-                if (!units.isNullOrBlank()) parameter("units", units)
-                if (!language.isNullOrBlank()) parameter("lang", language)
-                parameter("appid", apiKey)
+                takeFrom(baseUrl)
+                path("v1", "forecast")
+                parameter("latitude", lat)
+                parameter("longitude", lon)
+                parameter("timezone", timezone)
+                parameter("forecast_days", forecastDays.coerceIn(1, 16))
+                // Current weather
+                parameter(
+                    "current",
+                    "temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,rain,showers,snowfall,weather_code,cloud_cover,pressure_msl,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m"
+                )
+                // Hourly weather variables
+                parameter(
+                    "hourly",
+                    "temperature_2m,relative_humidity_2m,apparent_temperature,precipitation_probability,precipitation,rain,showers,snowfall,weather_code,cloud_cover,pressure_msl,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m,is_day"
+                )
+                // Daily weather variables
+                parameter(
+                    "daily",
+                    "weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,sunrise,sunset,daylight_duration,sunshine_duration,uv_index_max,precipitation_sum,rain_sum,showers_sum,snowfall_sum,precipitation_hours,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant"
+                )
             }
         }
     }
 
-    override fun getOneCallHistorical(
+    override fun getHistoricalWeather(
         lat: Double,
         lon: Double,
-        dt: Long,
-        exclude: String?,
-        units: String?,
-        language: String?
-    ): Flow<OneCallResponse> = executeAsFlow {
-        client.get(baseUrl) {
+        startDate: String,
+        endDate: String,
+        timezone: String
+    ): Flow<HistoricalWeatherResponse> = executeAsFlow {
+        client.get {
             url {
-                path("data", "3.0", "onecall", "timemachine")
-                parameter("lat", lat)
-                parameter("lon", lon)
-                parameter("dt", dt)
-                if (!exclude.isNullOrBlank()) parameter("exclude", exclude)
-                if (!units.isNullOrBlank()) parameter("units", units)
-                if (!language.isNullOrBlank()) parameter("lang", language)
-                parameter("appid", apiKey)
+                takeFrom(HISTORICAL_BASE_URL)
+                path("v1", "archive")
+                parameter("latitude", lat)
+                parameter("longitude", lon)
+                parameter("start_date", startDate)
+                parameter("end_date", endDate)
+                parameter("timezone", timezone)
+                parameter(
+                    "hourly",
+                    "temperature_2m,relative_humidity_2m,precipitation,weather_code,pressure_msl,wind_speed_10m,wind_direction_10m"
+                )
+                parameter(
+                    "daily",
+                    "weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max"
+                )
             }
         }
     }
 
-    override fun getFiveDayForecastByCoordinates(
+    override fun getCurrentAirQuality(
         lat: Double,
         lon: Double,
-        units: String?,
-        language: String?
-    ): Flow<Forecast5Response> = executeAsFlow {
-        client.get(baseUrl) {
+        timezone: String
+    ): Flow<AirQualityResponse> = executeAsFlow {
+        client.get {
             url {
-                path("data", "2.5", "forecast")
-                parameter("lat", lat)
-                parameter("lon", lon)
-                if (!units.isNullOrBlank()) parameter("units", units)
-                if (!language.isNullOrBlank()) parameter("lang", language)
-                parameter("appid", apiKey)
+                takeFrom(AIR_QUALITY_BASE_URL)
+                path("v1", "air-quality")
+                parameter("latitude", lat)
+                parameter("longitude", lon)
+                parameter("timezone", timezone)
+                parameter(
+                    "current",
+                    "european_aqi,us_aqi,pm2_5,pm10,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone"
+                )
             }
         }
     }
 
-    override fun getSixteenDayForecastByCoordinates(
+    override fun getAirQualityForecast(
         lat: Double,
         lon: Double,
-        units: String?,
-        language: String?
-    ): Flow<Forecast16Response> = executeAsFlow {
-        client.get(baseUrl) {
+        timezone: String,
+        forecastDays: Int
+    ): Flow<AirQualityResponse> = executeAsFlow {
+        client.get {
             url {
-                // 16 day daily forecast (paid plan)
-                path("data", "2.5", "forecast", "daily")
-                parameter("lat", lat)
-                parameter("lon", lon)
-                if (!units.isNullOrBlank()) parameter("units", units)
-                if (!language.isNullOrBlank()) parameter("lang", language)
-                parameter("appid", apiKey)
+                takeFrom(AIR_QUALITY_BASE_URL)
+                path("v1", "air-quality")
+                parameter("latitude", lat)
+                parameter("longitude", lon)
+                parameter("timezone", timezone)
+                parameter("forecast_days", forecastDays.coerceIn(1, 7))
+                parameter(
+                    "current",
+                    "european_aqi,us_aqi,pm2_5,pm10,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone"
+                )
+                parameter(
+                    "hourly",
+                    "european_aqi,us_aqi,pm2_5,pm10,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone"
+                )
+                parameter("daily", "european_aqi_max,us_aqi_max,pm2_5_max,pm10_max")
             }
         }
     }
 
-    override suspend fun getCurrentAirPollution(
-        lat: Double,
-        lon: Double
-    ): Flow<AirPollutionResponse> = executeAsFlow {
-        client.get(baseUrl) {
+    override fun searchLocations(
+        name: String,
+        count: Int,
+        language: String,
+        format: String
+    ): Flow<List<GeocodingResponse>> = executeAsFlow<GeocodingApiResponse> {
+        client.get {
             url {
-                path("data", "2.5", "air_pollution")
-                parameter("lat", lat)
-                parameter("lon", lon)
-                parameter("appid", apiKey)
+                takeFrom(GEOCODING_BASE_URL)
+                path("v1", "search")
+                parameter("name", name)
+                parameter("count", count.coerceIn(1, 100))
+                parameter("language", language)
+                parameter("format", format)
             }
         }
+    }.map { response ->
+        response.results
     }
 
-    override suspend fun getForecastAirPollution(
-        lat: Double,
-        lon: Double
-    ): Flow<AirPollutionResponse> = executeAsFlow {
-        client.get(baseUrl) {
-            url {
-                path("data", "2.5", "air_pollution", "forecast")
-                parameter("lat", lat)
-                parameter("lon", lon)
-                parameter("appid", apiKey)
-            }
-        }
-    }
-
-    override suspend fun getHistoricalAirPollution(
-        lat: Double,
-        lon: Double,
-        start: Long,
-        end: Long
-    ): Flow<AirPollutionResponse> = executeAsFlow {
-        client.get(baseUrl) {
-            url {
-                path("data", "2.5", "air_pollution", "history")
-                parameter("lat", lat)
-                parameter("lon", lon)
-                parameter("start", start)
-                parameter("end", end)
-                parameter("appid", apiKey)
-            }
-        }
-    }
-
-    override suspend fun getGeocodingDirect(
-        cityName: String,
-        stateCode: String?,
-        countryCode: String?,
-        limit: Int?
-    ): Flow<List<GeocodingResponse>> = executeAsFlow {
-        val q = buildString {
-            append(cityName)
-            if (!stateCode.isNullOrBlank()) append(",$stateCode")
-            if (!countryCode.isNullOrBlank()) append(",$countryCode")
-        }
-        client.get(baseUrl) {
-            url {
-                path("geo", "1.0", "direct")
-                parameter("q", q)
-                if (limit != null) parameter("limit", limit)
-                parameter("appid", apiKey)
-            }
-        }
-    }
-
-    override suspend fun getGeocodingReverse(
+    override fun getLocationByCoordinates(
         lat: Double,
         lon: Double,
-        limit: Int?
-    ): Flow<List<ReverseGeocodingResponse>> = executeAsFlow {
-        client.get(baseUrl) {
+        count: Int,
+        language: String
+    ): Flow<GeocodingResponse?> = executeAsFlow<GeocodingApiResponse> {
+        client.get {
             url {
-                path("geo", "1.0", "reverse")
-                parameter("lat", lat)
-                parameter("lon", lon)
-                if (limit != null) parameter("limit", limit)
-                parameter("appid", apiKey)
+                takeFrom(GEOCODING_BASE_URL)
+                path("v1", "reverse")
+                parameter("latitude", lat)
+                parameter("longitude", lon)
+                parameter("count", count.coerceIn(1, 100))
+                parameter("language", language)
             }
         }
+    }.map { response ->
+        response.results.firstOrNull()
     }
 
     companion object {
-        const val DEFAULT_BASE_URL: String = "https://api.openweathermap.org/"
+        const val DEFAULT_BASE_URL: String = "https://api.open-meteo.com/"
+        const val HISTORICAL_BASE_URL: String = "https://archive-api.open-meteo.com/"
+        const val AIR_QUALITY_BASE_URL: String = "https://air-quality-api.open-meteo.com/"
+        const val GEOCODING_BASE_URL: String = "https://geocoding-api.open-meteo.com/"
     }
 }
