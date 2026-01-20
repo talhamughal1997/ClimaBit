@@ -12,6 +12,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -267,18 +268,19 @@ fun AppNavigation() {
                 // Dashboard entry with list/detail pane support
                 entry<Dashboard>(
                     metadata = ListDetailSceneStrategy.listPane(
-                    detailPlaceholder = {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "Select a location to view details",
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                        }
-                    })) {
+                        detailPlaceholder = {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "Select a location to view details",
+                                    textAlign = TextAlign.Center,
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                            }
+                        })
+                ) {
                     DashboardScreen(onLocationSelected = { lat, lon, locationName, locationCountry ->
                         backStack.add(
                             WeatherDetails(
@@ -296,18 +298,19 @@ fun AppNavigation() {
                 // Forecast entry with list/detail pane support
                 entry<Forecast>(
                     metadata = ListDetailSceneStrategy.listPane(
-                    detailPlaceholder = {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "Select a forecast item to view details",
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                        }
-                    })) {
+                        detailPlaceholder = {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "Select a forecast item to view details",
+                                    textAlign = TextAlign.Center,
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                            }
+                        })
+                ) {
                     ForecastScreen(
                         onForecastItemSelected = { lat, lon, locationName, locationCountry ->
                             backStack.add(
@@ -387,7 +390,10 @@ fun AppNavigation() {
                         )
                     }
                 ) { paddingValues ->
-                    Box(modifier = Modifier.padding(paddingValues)) {
+                    Box(
+                        modifier = Modifier.padding(paddingValues)
+                            .consumeWindowInsets(paddingValues)
+                    ) {
                         mainContent()
                     }
                 }
@@ -397,7 +403,10 @@ fun AppNavigation() {
         NavigationType.Rail -> {
             Scaffold(
                 content = { paddingValues ->
-                    Row(modifier = Modifier.padding(paddingValues)) {
+                    Row(
+                        modifier = Modifier.padding(paddingValues)
+                            .consumeWindowInsets(paddingValues)
+                    ) {
                         navigationContent()
                         Box(modifier = Modifier.weight(1f)) {
                             mainContent()
@@ -411,9 +420,12 @@ fun AppNavigation() {
             Scaffold(
                 bottomBar = {
                     navigationContent()
-                }
+                },
             ) { paddingValues ->
-                Box {
+                Box(
+                    modifier = Modifier.padding(paddingValues)
+                        .consumeWindowInsets(paddingValues)
+                ) {
                     mainContent()
                 }
             }
