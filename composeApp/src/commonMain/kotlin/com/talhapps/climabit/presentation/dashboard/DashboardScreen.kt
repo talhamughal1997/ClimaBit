@@ -3,6 +3,7 @@ package com.talhapps.climabit.presentation.dashboard
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -246,9 +247,9 @@ private fun MainWeatherCard(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            // Weather Description (using weather code)
-            val weatherCode = weather.current?.weatherCode
+            ) {
+                // Weather Description (using weather code)
+                val weatherCode = weather.current?.weatherCode
                 getWeatherDescription(weatherCode)
                 val weatherIcon =
                     getWeatherIcon(weatherCode, weather.hourly?.isDay?.getOrNull(0) ?: 1)
@@ -262,7 +263,7 @@ private fun MainWeatherCard(
                     model = "https://openweathermap.org/img/wn/${weatherIcon}@4x.png",
                     contentDescription = getWeatherDescription(weatherCode),
                     modifier = Modifier.size(100.dp)
-            )
+                )
 
 
                 Column {
@@ -338,8 +339,10 @@ private fun WeatherDetailsGrid(weather: OpenMeteoResponse) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp),
+            maxItemsInEachRow = 2,
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             // Humidity
             WeatherDetailCard(
@@ -354,11 +357,7 @@ private fun WeatherDetailsGrid(weather: OpenMeteoResponse) {
                 title = "Pressure",
                 value = "${weather.current?.pressureMsl?.toInt() ?: 0} hPa"
             )
-        }
 
-        Row(
-            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
             // Wind Speed
             WeatherDetailCard(
                 modifier = Modifier.weight(1f),
@@ -382,7 +381,7 @@ private fun WeatherDetailCard(
 ) {
     Card(
         modifier = modifier, shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
         )
     ) {
         Column(
@@ -412,7 +411,7 @@ private fun AdditionalInfoCard(weather: OpenMeteoResponse) {
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
         )
     ) {
         Column(
