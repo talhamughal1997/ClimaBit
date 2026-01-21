@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -40,7 +39,7 @@ fun TodayForecastSection(
     ) {
         // Header
         Text(
-            text = "TODAY'S FORECAST",
+            text = "Today's Forecast",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -90,9 +89,9 @@ private fun HourlyForecastItem(
     Card(
         modifier = Modifier
             .size(width = 80.dp, height = 120.dp),
-        shape = RoundedCornerShape(16.dp),
+        shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
         )
     ) {
         Column(
@@ -148,7 +147,7 @@ private fun formatTime(hour: Int, minute: Int): String {
 /**
  * Get weather icon code from WMO weather code
  */
-private fun getWeatherIcon(code: Int?, isDay: Int): String? {
+fun getWeatherIcon(code: Int?, isDay: Int): String? {
     if (code == null) return null
     val dayNight = if (isDay == 1) "d" else "n"
     return when (code) {
