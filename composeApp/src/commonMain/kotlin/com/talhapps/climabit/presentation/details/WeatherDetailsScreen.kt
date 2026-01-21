@@ -27,7 +27,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.talhapps.climabit.core.ui.mvi.useMvi
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
+import kotlinx.datetime.toLocalDateTime
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.Clock
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -288,6 +293,29 @@ fun WeatherDetailsScreen(
                         )
                     }
                     itemsIndexed(daily.time.take(7)) { index, timeStr ->
+                        // Convert date string to day name
+                        val dayName = try {
+                            val date = LocalDate.parse(timeStr)
+                            val timeZone = TimeZone.currentSystemDefault()
+                            val today = Clock.System.now().toLocalDateTime(timeZone).date
+
+                            when {
+                                date == today -> "Today"
+                                date == today.plus(
+                                    1,
+                                    kotlinx.datetime.DateTimeUnit.DAY
+                                ) -> "Tomorrow"
+
+                                else -> {
+                                    // Get day of week name - format enum name to readable format
+                                    date.dayOfWeek.name.lowercase()
+                                        .replaceFirstChar { it.uppercaseChar() }
+                                }
+                            }
+                        } catch (e: Exception) {
+                            timeStr
+                        }
+                        
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp)
@@ -301,7 +329,7 @@ fun WeatherDetailsScreen(
                             ) {
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
-                                        text = timeStr,
+                                        text = dayName,
                                         style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Bold
                                     )
