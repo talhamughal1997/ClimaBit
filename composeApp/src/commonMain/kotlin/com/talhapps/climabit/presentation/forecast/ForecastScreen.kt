@@ -74,7 +74,7 @@ private fun ForecastListPane(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("5-Day Forecast") }
+                title = { Text("7-Day Forecast") }
             )
         }
     ) { paddingValues ->

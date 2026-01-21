@@ -85,7 +85,7 @@ private sealed interface TopLevelRoute : Route
 private data object Dashboard : TopLevelRoute
 
 /**
- * Forecast route - 5-day forecast screen.
+ * Forecast route - 7-day forecast screen.
  */
 @Serializable
 private data object Forecast : TopLevelRoute
