@@ -301,7 +301,7 @@ private fun MainWeatherCard(
                     Text(
                         modifier = Modifier.background(
                             shape = MaterialTheme.shapes.medium,
-                            color = MaterialTheme.colorScheme.surfaceVariant
+                            color = MaterialTheme.colorScheme.surfaceContainerLow
                         ).padding(vertical = 8.dp, horizontal = 12.dp),
                         text = buildAnnotatedString {
                             append("Low ↓ ")
@@ -310,14 +310,14 @@ private fun MainWeatherCard(
                             }
                         },
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     )
                 }
                 oneCallData?.daily?.temperature2mMax?.getOrNull(0)?.let { maxTemp ->
                     Text(
                         modifier = Modifier.background(
                             shape = MaterialTheme.shapes.medium,
-                            color = MaterialTheme.colorScheme.surfaceVariant
+                            color = MaterialTheme.colorScheme.surfaceContainerLow
                         ).padding(vertical = 8.dp, horizontal = 12.dp),
                         text = buildAnnotatedString {
                             append("High ↑ ")
@@ -326,7 +326,7 @@ private fun MainWeatherCard(
                             }
                         },
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     )
                 }
             }
