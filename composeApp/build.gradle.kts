@@ -72,7 +72,6 @@ kotlin {
             implementation(libs.kotlinx.datetime)
 
             implementation(libs.navigation.compose)
-            implementation(libs.lifecycle.runtime.compose)
             implementation(libs.material.icons.core)
             implementation(libs.jetbrains.navigation3.ui)
             implementation(libs.jetbrains.material3.adaptiveNavigation3)
