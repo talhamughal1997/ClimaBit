@@ -87,8 +87,6 @@ private fun HourlyForecastItem(
     val weatherIcon = getWeatherIcon(weatherCode, isDay)
 
     Card(
-        modifier = Modifier
-            .size(width = 80.dp, height = 120.dp),
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow

@@ -11,9 +11,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -43,6 +43,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.talhapps.climabit.core.ui.mvi.useMvi
+import com.talhapps.climabit.domain.model.weather.AirQualityResponse
 import com.talhapps.climabit.domain.model.weather.OpenMeteoResponse
 import com.talhapps.climabit.presentation.dashboard.getWeatherDescription
 import com.talhapps.climabit.presentation.dashboard.getWeatherIcon
@@ -67,6 +68,7 @@ fun ForecastScreen(
                 is ForecastEffect.ShowError -> {
                     // Handle error
                 }
+
                 is ForecastEffect.NavigateToDetails -> {
                     onForecastItemSelected(
                         effect.lat,
@@ -158,20 +160,36 @@ private fun ForecastContent(
 
                     // AQI Card
                     item {
-                        state.airQuality?.let { airQuality ->
-                            AQICard(airQuality = airQuality, dayIndex = selectedIndex)
+                        Row(modifier = Modifier.fillMaxWidth()) {
+                            state.airQuality?.let { airQuality ->
+                                AQICard(
+                                    modifier = Modifier.weight(1f),
+                                    airQuality = airQuality,
+                                    dayIndex = selectedIndex
+                                )
+                            }
+
+                            //Weather Info
+                            WeatherInfoCard(
+                                modifier = Modifier.weight(1f),
+                                weatherCode = dailyData?.weatherCode?.getOrNull(selectedIndex),
+                                description = getWeatherDescription(
+                                    dailyData?.weatherCode?.getOrNull(selectedIndex)
+                                )
+                            )
+
                         }
                     }
 
                     // Weather Info
-                    item {
-                        WeatherInfoCard(
-                            weatherCode = dailyData?.weatherCode?.getOrNull(selectedIndex),
-                            description = getWeatherDescription(
-                                dailyData?.weatherCode?.getOrNull(selectedIndex)
-                            )
-                        )
-                    }
+//                    item {
+//                        WeatherInfoCard(
+//                            weatherCode = dailyData?.weatherCode?.getOrNull(selectedIndex),
+//                            description = getWeatherDescription(
+//                                dailyData?.weatherCode?.getOrNull(selectedIndex)
+//                            )
+//                        )
+//                    }
 
                     // Day Selection Tab Bar
                     item {
@@ -228,51 +246,47 @@ private fun SelectedDayWeatherCard(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.extraLarge,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
         )
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp),
+                .padding(horizontal = 24.dp, vertical = 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
                 text = dayName,
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.SemiBold
             )
 
-            weatherIcon?.let { icon ->
-                AsyncImage(
-                    model = "https://openweathermap.org/img/wn/${icon}@4x.png",
-                    contentDescription = getWeatherDescription(weatherCode),
-                    modifier = Modifier.size(120.dp)
-                )
-            }
 
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+
+                weatherIcon?.let { icon ->
+                    AsyncImage(
+                        model = "https://openweathermap.org/img/wn/${icon}@4x.png",
+                        contentDescription = getWeatherDescription(weatherCode),
+                        modifier = Modifier.size(140.dp)
+                    )
+                }
+
                 minTemp?.let { min ->
                     Text(
-                        text = "${min.toInt()}°",
+                        text = "L ${min.toInt()}°",
                         style = MaterialTheme.typography.headlineMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                Text(
-                    text = "|",
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                )
                 maxTemp?.let { max ->
                     Text(
-                        text = "${max.toInt()}°",
+                        text = "H ${max.toInt()}°",
                         style = MaterialTheme.typography.displaySmall,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Medium
                     )
                 }
             }
@@ -282,7 +296,8 @@ private fun SelectedDayWeatherCard(
 
 @Composable
 private fun AQICard(
-    airQuality: com.talhapps.climabit.domain.model.weather.AirQualityResponse,
+    modifier: Modifier = Modifier,
+    airQuality: AirQualityResponse,
     dayIndex: Int
 ) {
     val dailyAqi = airQuality.daily
@@ -293,60 +308,52 @@ private fun AQICard(
     val (aqiLabel, aqiColor) = getAQIInfo(aqiValue)
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.wrapContentSize(),
         shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(
-            containerColor = aqiColor.copy(alpha = 0.2f)
-        )
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest)
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
+                .wrapContentSize()
                 .padding(20.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.spacedBy(24.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(modifier = Modifier.weight(1f)) {
+
+            Row {
                 Text(
-                    text = "Air Quality Index",
+                    text = "AQI: $aqiValue",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium
                 )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = aqiLabel,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = aqiColor
-                )
             }
-            Icon(
-                imageVector = Icons.Default.Air,
-                contentDescription = "Air Quality",
-                modifier = Modifier.size(48.dp),
-                tint = aqiColor
+            Text(
+                text = aqiLabel,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Medium,
+                color = aqiColor
             )
+
         }
     }
 }
 
 @Composable
 private fun WeatherInfoCard(
+    modifier: Modifier = Modifier,
     weatherCode: Int?,
     description: String
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
-        )
+        modifier = modifier.wrapContentSize(),
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLowest)
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
+                .wrapContentSize()
                 .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.spacedBy(24.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
@@ -403,7 +410,7 @@ private fun DaySelectionTabBar(
             Card(
                 modifier = Modifier
                     .clickable { onDaySelected(dayIndex) },
-                shape = MaterialTheme.shapes.medium,
+                shape = MaterialTheme.shapes.large,
                 colors = CardDefaults.cardColors(
                     containerColor = if (isSelected) {
                         MaterialTheme.colorScheme.primaryContainer
@@ -420,7 +427,7 @@ private fun DaySelectionTabBar(
                     Text(
                         text = dayName,
                         style = MaterialTheme.typography.labelMedium,
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
                         color = if (isSelected) {
                             MaterialTheme.colorScheme.onPrimaryContainer
                         } else {
@@ -491,11 +498,6 @@ private fun WeatherDetailsGrid(
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text(
-            text = "Weather Details",
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold
-        )
 
         // Grid layout (2 columns)
         details.chunked(2).forEach { rowItems ->
@@ -546,7 +548,7 @@ private fun WeatherDetailCard(
             Text(
                 text = detail.value,
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.SemiBold
             )
             Text(
                 text = detail.label,
