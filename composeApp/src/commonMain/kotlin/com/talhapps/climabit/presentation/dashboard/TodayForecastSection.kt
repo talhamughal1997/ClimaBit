@@ -123,7 +123,7 @@ private fun HourlyForecastItem(
             Text(
                 text = tempDisplay,
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface
             )
         }

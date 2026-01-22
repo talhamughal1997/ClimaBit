@@ -179,26 +179,37 @@ private fun ForecastItemCard(
                 Text(
                     text = dateDisplay,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Medium
                 )
                 Text(
                     text = weatherDescription,
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 minTemp?.let { min ->
                     Text(
-                        text = "${min.toInt()}°",
-                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.background(
+                            shape = MaterialTheme.shapes.medium,
+                            color = MaterialTheme.colorScheme.surfaceContainer
+                        ).padding(vertical = 8.dp, horizontal = 12.dp),
+                        text = "↓ ${min.toInt()}°",
+                        style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 maxTemp?.let { max ->
                     Text(
-                        text = "${max.toInt()}°",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold
+                        modifier = Modifier.background(
+                            shape = MaterialTheme.shapes.medium,
+                            color = MaterialTheme.colorScheme.surfaceContainer
+                        ).padding(vertical = 8.dp, horizontal = 12.dp),
+                        text = "↑ ${max.toInt()}°",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
             }

@@ -272,7 +272,7 @@ private fun MainWeatherCard(
                         Text(
                             text = "${temp.toInt()}°C",
                             style = MaterialTheme.typography.displayLarge,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -305,7 +305,7 @@ private fun MainWeatherCard(
                         ).padding(vertical = 8.dp, horizontal = 12.dp),
                         text = buildAnnotatedString {
                             append("Low ↓ ")
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
                                 append("${minTemp.toInt()}°")
                             }
                         },
@@ -321,7 +321,7 @@ private fun MainWeatherCard(
                         ).padding(vertical = 8.dp, horizontal = 12.dp),
                         text = buildAnnotatedString {
                             append("High ↑ ")
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
                                 append("${maxTemp.toInt()}°")
                             }
                         },
@@ -398,7 +398,7 @@ private fun WeatherDetailCard(
             Text(
                 text = value,
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Center
             )
         }
@@ -421,7 +421,7 @@ private fun AdditionalInfoCard(weather: OpenMeteoResponse) {
             Text(
                 text = "Additional Information",
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.SemiBold
             )
 
             Divider()

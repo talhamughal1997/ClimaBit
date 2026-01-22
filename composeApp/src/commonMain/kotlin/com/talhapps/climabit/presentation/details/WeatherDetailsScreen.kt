@@ -9,9 +9,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -20,10 +22,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.talhapps.climabit.core.ui.mvi.useMvi
@@ -98,7 +102,7 @@ fun WeatherDetailsScreen(
                     Text(
                         text = locationName,
                         style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Medium
                     )
                     state.location?.country?.let { country ->
                         Text(
@@ -124,7 +128,7 @@ fun WeatherDetailsScreen(
                                 Text(
                                     text = "Current Weather",
                                     style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Medium
                                 )
                                 weather.current?.let { current ->
                                     Row(
@@ -138,7 +142,7 @@ fun WeatherDetailsScreen(
                                         Text(
                                             "${current.temperature2m?.toInt() ?: 0}°C",
                                             style = MaterialTheme.typography.bodyLarge,
-                                            fontWeight = FontWeight.Bold
+                                            fontWeight = FontWeight.SemiBold
                                         )
                                     }
                                     Row(
@@ -214,7 +218,7 @@ fun WeatherDetailsScreen(
                                 Text(
                                     text = "Air Quality",
                                     style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Medium
                                 )
                                 airQuality.current?.let { current ->
                                     current.europeanAqi?.let { aqi ->
@@ -229,7 +233,7 @@ fun WeatherDetailsScreen(
                                             Text(
                                                 "$aqi",
                                                 style = MaterialTheme.typography.bodyLarge,
-                                                fontWeight = FontWeight.Bold
+                                                fontWeight = FontWeight.SemiBold
                                             )
                                         }
                                     }
@@ -245,7 +249,7 @@ fun WeatherDetailsScreen(
                                             Text(
                                                 "$aqi",
                                                 style = MaterialTheme.typography.bodyLarge,
-                                                fontWeight = FontWeight.Bold
+                                                fontWeight = FontWeight.SemiBold
                                             )
                                         }
                                     }
@@ -291,7 +295,7 @@ fun WeatherDetailsScreen(
                         Text(
                             text = "7-Day Forecast",
                             style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Medium
                         )
                     }
                     itemsIndexed(daily.time.take(7)) { index, timeStr ->
@@ -334,22 +338,29 @@ fun WeatherDetailsScreen(
                                     Text(
                                         text = dayName,
                                         style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Bold
+                                        fontWeight = FontWeight.Medium
                                     )
                                 }
-                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
                                     daily.temperature2mMin.getOrNull(index)?.let { min ->
                                         Text(
-                                            "${min.toInt()}°",
+                                            "L ${min.toInt()}°",
                                             style = MaterialTheme.typography.bodyLarge,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
                                     }
+                                    VerticalDivider(
+                                        modifier = Modifier.height(20.dp).clip(CircleShape),
+                                        thickness = 1.dp
+                                    )
                                     daily.temperature2mMax.getOrNull(index)?.let { max ->
                                         Text(
-                                            "${max.toInt()}°",
+                                            "H ${max.toInt()}°",
                                             style = MaterialTheme.typography.titleMedium,
-                                            fontWeight = FontWeight.Bold
+                                            fontWeight = FontWeight.Medium
                                         )
                                     }
                                 }

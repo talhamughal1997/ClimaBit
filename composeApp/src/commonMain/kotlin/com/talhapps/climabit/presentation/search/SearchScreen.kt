@@ -75,6 +75,7 @@ fun SearchScreen(
             // Search Bar
             OutlinedTextField(
                 value = searchQuery,
+                shape = MaterialTheme.shapes.large,
                 onValueChange = { 
                     searchQuery = it
                     viewModel.handleIntent(SearchIntent.Search(it))
@@ -138,7 +139,7 @@ private fun LocationItemCard(
                 Text(
                     text = location.name ?: "",
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.SemiBold
                 )
                 val locationDetails = buildString {
                     location.admin1?.let { append(it) }
