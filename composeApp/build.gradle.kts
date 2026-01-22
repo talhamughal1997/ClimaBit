@@ -75,6 +75,8 @@ kotlin {
             implementation(libs.material.icons.core)
             implementation(libs.jetbrains.navigation3.ui)
             implementation(libs.jetbrains.material3.adaptiveNavigation3)
+            implementation(libs.material.icons.extended)
+
 
 
             implementation(libs.coil.compose)
