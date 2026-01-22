@@ -167,7 +167,7 @@ fun getWeatherIcon(code: Int?, isDay: Int): String? {
 /**
  * Get weather description from WMO weather code
  */
-internal fun getWeatherDescription(code: Int?): String {
+fun getWeatherDescription(code: Int?): String {
     if (code == null) return "Unknown"
     return when (code) {
         0 -> "Clear sky"

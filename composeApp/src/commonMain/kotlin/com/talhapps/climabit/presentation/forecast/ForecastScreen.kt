@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,7 +28,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.talhapps.climabit.core.ui.mvi.useMvi
+import com.talhapps.climabit.presentation.dashboard.getWeatherDescription
+import com.talhapps.climabit.presentation.dashboard.getWeatherIcon
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
@@ -147,20 +151,9 @@ private fun ForecastItemCard(
         timeStr
     }
 
-    val weatherDescription = when (weatherCode) {
-        0 -> "Clear sky"
-        1 -> "Mainly clear"
-        2 -> "Partly cloudy"
-        3 -> "Overcast"
-        45, 48 -> "Fog"
-        in 51..57 -> "Drizzle"
-        in 61..67 -> "Rain"
-        in 71..77 -> "Snow"
-        in 80..82 -> "Rain showers"
-        in 85..86 -> "Snow showers"
-        95, 96, 99 -> "Thunderstorm"
-        else -> "Unknown"
-    }
+    // Get weather description and icon
+    val weatherDescription = getWeatherDescription(weatherCode)
+    val weatherIcon = getWeatherIcon(weatherCode, isDay = 1) // Use day icons for daily forecast
     
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -175,7 +168,20 @@ private fun ForecastItemCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(modifier = Modifier.weight(1f)) {
+            // Weather Icon
+            weatherIcon?.let { icon ->
+                AsyncImage(
+                    model = "https://openweathermap.org/img/wn/${icon}@2x.png",
+                    contentDescription = weatherDescription,
+                    modifier = Modifier.size(48.dp)
+                )
+            }
+
+            // Day name and weather description
+            Column(
+                modifier = Modifier.weight(1f).padding(horizontal = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
                 Text(
                     text = dateDisplay,
                     style = MaterialTheme.typography.titleMedium,
@@ -183,9 +189,12 @@ private fun ForecastItemCard(
                 )
                 Text(
                     text = weatherDescription,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+
+            // Temperature range
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
