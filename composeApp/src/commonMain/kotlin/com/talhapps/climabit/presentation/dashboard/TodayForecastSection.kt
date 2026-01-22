@@ -113,7 +113,7 @@ private fun HourlyForecastItem(
                 AsyncImage(
                     model = "https://openweathermap.org/img/wn/${weatherIcon}@2x.png",
                     contentDescription = getWeatherDescription(weatherCode),
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier.size(50.dp)
                 )
             } else {
                 Box(modifier = Modifier.size(40.dp))
