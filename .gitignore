@@ -17,3 +17,7 @@ captures
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
 node_modules/
+
+# API Keys - DO NOT COMMIT
+**/ApiKeys.kt
+composeApp/src/commonMain/kotlin/com/talhapps/climabit/core/config/ApiKeys.kt

@@ -1,10 +1,13 @@
 package com.talhapps.climabit.di.module.domain.usecase
 
 import com.talhapps.climabit.core.domain.UseCase
+import com.talhapps.climabit.domain.model.gemini.GeminiInsightRequest
+import com.talhapps.climabit.domain.model.gemini.GeminiResponse
 import com.talhapps.climabit.domain.model.weather.AirQualityResponse
 import com.talhapps.climabit.domain.model.weather.GeocodingResponse
 import com.talhapps.climabit.domain.model.weather.OpenMeteoResponse
 import com.talhapps.climabit.domain.model.weather.WeatherRequest
+import com.talhapps.climabit.domain.usecase.gemini.GetGeminiInsightsUseCase
 import com.talhapps.climabit.domain.usecase.weather.GetAirQualityUseCase
 import com.talhapps.climabit.domain.usecase.weather.GetCurrentWeatherDataUseCase
 import com.talhapps.climabit.domain.usecase.weather.GetGeocodingUseCase
@@ -29,5 +32,8 @@ val useCaseModule = module {
     // Geocoding
     singleOf(::GetGeocodingUseCase).bind<UseCase<String, List<GeocodingResponse>>>()
     singleOf(::GetReverseGeocodingUseCase).bind<UseCase<WeatherRequest, GeocodingResponse?>>()
+
+    // Gemini AI
+    singleOf(::GetGeminiInsightsUseCase).bind<UseCase<GeminiInsightRequest, GeminiResponse>>()
 
 }

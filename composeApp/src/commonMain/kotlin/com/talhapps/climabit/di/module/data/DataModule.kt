@@ -1,8 +1,12 @@
 package com.talhapps.climabit.di.module.data
 
+import com.talhapps.climabit.data.remote.GeminiApi
+import com.talhapps.climabit.data.remote.GeminiApiImpl
 import com.talhapps.climabit.data.remote.WeatherApi
 import com.talhapps.climabit.data.remote.WeatherApiImpl
+import com.talhapps.climabit.data.repository.GeminiRepositoryImpl
 import com.talhapps.climabit.data.repository.WeatherRepositoryImpl
+import com.talhapps.climabit.domain.repository.GeminiRepository
 import com.talhapps.climabit.domain.repository.WeatherRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -53,5 +57,14 @@ val dataModule = module {
             client = get()
         )
     }
+
+    // Gemini API
+    single<GeminiApi> {
+        GeminiApiImpl(
+            client = get()
+        )
+    }
+
+    singleOf(::GeminiRepositoryImpl).bind<GeminiRepository>()
 
 }
