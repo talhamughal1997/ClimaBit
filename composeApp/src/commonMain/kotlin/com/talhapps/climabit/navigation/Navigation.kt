@@ -25,7 +25,6 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -296,21 +295,7 @@ fun AppNavigation() {
                 }
 
                 // Forecast entry with list/detail pane support
-                entry<Forecast>(
-                    metadata = ListDetailSceneStrategy.listPane(
-                        detailPlaceholder = {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = "Select a forecast item to view details",
-                                    textAlign = TextAlign.Center,
-                                    style = MaterialTheme.typography.bodyLarge
-                                )
-                            }
-                        })
-                ) {
+                entry<Forecast> {
                     ForecastScreen(
                         onForecastItemSelected = { lat, lon, locationName, locationCountry ->
                             backStack.add(
@@ -562,7 +547,6 @@ private fun ClimaBitNavigationDrawer(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
 
-        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
         // Top level routes
         topLevelRoutes.forEach { route ->
@@ -587,7 +571,6 @@ private fun ClimaBitNavigationDrawer(
             )
         }
 
-        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
         // Settings
         NavigationDrawerItem(

@@ -264,7 +264,10 @@ private fun MainWeatherCard(
                 )
 
 
-                Column {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     // Temperature
                     weather.current?.temperature2m?.let { temp ->
                         Text(
@@ -275,7 +278,6 @@ private fun MainWeatherCard(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
 
                     // Feels Like
                     weather.current?.apparentTemperature?.let { feelsLike ->
@@ -286,48 +288,52 @@ private fun MainWeatherCard(
                         )
                     }
 
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Min/Max Temperature for today (from oneCallData which has daily forecast)
+                    Row(
+                        modifier = Modifier.align(Alignment.End),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        oneCallData?.daily?.temperature2mMin?.getOrNull(0)?.let { minTemp ->
+                            Text(
+                                modifier = Modifier.background(
+                                    shape = MaterialTheme.shapes.medium,
+                                    color = MaterialTheme.colorScheme.surfaceContainerLow
+                                ).padding(vertical = 8.dp, horizontal = 12.dp),
+                                text = buildAnnotatedString {
+                                    append("L ↓ ")
+                                    withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
+                                        append("${minTemp.toInt()}°")
+                                    }
+                                },
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                            )
+                        }
+                        oneCallData?.daily?.temperature2mMax?.getOrNull(0)?.let { maxTemp ->
+                            Text(
+                                modifier = Modifier.background(
+                                    shape = MaterialTheme.shapes.medium,
+                                    color = MaterialTheme.colorScheme.surfaceContainerLow
+                                ).padding(vertical = 8.dp, horizontal = 12.dp),
+                                text = buildAnnotatedString {
+                                    append("H ↑ ")
+                                    withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
+                                        append("${maxTemp.toInt()}°")
+                                    }
+                                },
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                            )
+                        }
+                    }
+
                 }
 
 
             }
-            // Min/Max Temperature for today (from oneCallData which has daily forecast)
-            Row(
-                modifier = Modifier.align(Alignment.End),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                oneCallData?.daily?.temperature2mMin?.getOrNull(0)?.let { minTemp ->
-                    Text(
-                        modifier = Modifier.background(
-                            shape = MaterialTheme.shapes.medium,
-                            color = MaterialTheme.colorScheme.surfaceContainerLow
-                        ).padding(vertical = 8.dp, horizontal = 12.dp),
-                        text = buildAnnotatedString {
-                            append("Low ↓ ")
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
-                                append("${minTemp.toInt()}°")
-                            }
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                    )
-                }
-                oneCallData?.daily?.temperature2mMax?.getOrNull(0)?.let { maxTemp ->
-                    Text(
-                        modifier = Modifier.background(
-                            shape = MaterialTheme.shapes.medium,
-                            color = MaterialTheme.colorScheme.surfaceContainerLow
-                        ).padding(vertical = 8.dp, horizontal = 12.dp),
-                        text = buildAnnotatedString {
-                            append("High ↑ ")
-                            withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
-                                append("${maxTemp.toInt()}°")
-                            }
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                    )
-                }
-            }
+
         }
     }
 }

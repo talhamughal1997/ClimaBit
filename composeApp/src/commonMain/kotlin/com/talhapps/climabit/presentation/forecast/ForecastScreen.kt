@@ -566,13 +566,15 @@ private data class WeatherDetail(
     val icon: androidx.compose.ui.graphics.vector.ImageVector
 )
 
+@Composable
 private fun getAQIInfo(aqi: Int): Pair<String, Color> {
+    val colorScheme = MaterialTheme.colorScheme
     return when {
-        aqi <= 50 -> Pair("Good", Color(0xFF4CAF50))
-        aqi <= 100 -> Pair("Moderate", Color(0xFFFFEB3B))
-        aqi <= 150 -> Pair("Unhealthy for Sensitive", Color(0xFFFF9800))
-        aqi <= 200 -> Pair("Unhealthy", Color(0xFFFF5722))
-        aqi <= 300 -> Pair("Very Unhealthy", Color(0xFF9C27B0))
-        else -> Pair("Hazardous", Color(0xFFE91E63))
+        aqi <= 50 -> Pair("Good", colorScheme.primary)
+        aqi <= 100 -> Pair("Moderate", colorScheme.secondary)
+        aqi <= 150 -> Pair("Unhealthy for Sensitive", colorScheme.tertiary)
+        aqi <= 200 -> Pair("Unhealthy", colorScheme.error)
+        aqi <= 300 -> Pair("Very Unhealthy", colorScheme.errorContainer)
+        else -> Pair("Hazardous", colorScheme.error)
     }
 }
