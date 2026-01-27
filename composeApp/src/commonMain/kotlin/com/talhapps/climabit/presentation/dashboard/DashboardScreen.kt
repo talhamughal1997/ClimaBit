@@ -14,14 +14,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -380,7 +378,7 @@ private fun WeatherDetailCard(
     modifier: Modifier = Modifier, title: String, value: String
 ) {
     Card(
-        modifier = modifier, shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(
+        modifier = modifier, shape = MaterialTheme.shapes.medium, colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow
         )
     ) {
@@ -407,66 +405,76 @@ private fun WeatherDetailCard(
 
 @Composable
 private fun AdditionalInfoCard(weather: OpenMeteoResponse) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
-        )
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Text(
-                text = "Additional Information",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
-            )
 
-            Divider()
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text(
+            text = "Additional Information",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Medium
+        )
+
+        FlowRow(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            maxItemsInEachRow = 2,
+        ) {
 
             // Cloud Coverage
             weather.current?.cloudCover?.let { clouds ->
                 InfoRow(
-                    label = "Cloud Coverage", value = "$clouds%"
+                    modifier = Modifier.weight(1f), label = "Cloud Coverage", value = "$clouds%"
                 )
             }
 
             // Wind Direction
             weather.current?.windDirection10m?.let { deg ->
                 InfoRow(
-                    label = "Wind Direction", value = "${deg}°"
+                    modifier = Modifier.weight(1f), label = "Wind Direction", value = "${deg}°"
                 )
             }
 
             // Wind Gust
             weather.current?.windGusts10m?.let { gust ->
                 InfoRow(
-                    label = "Wind Gust", value = "$gust km/h"
+                    modifier = Modifier.weight(1f), label = "Wind Gust", value = "$gust km/h"
                 )
             }
         }
+
     }
 }
 
 @Composable
 private fun InfoRow(
-    label: String, value: String
+    modifier: Modifier = Modifier, label: String, value: String
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
+    Card(
+        modifier = modifier,
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+        )
     ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium
-        )
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
     }
 }
 
@@ -474,7 +482,7 @@ private fun InfoRow(
 private fun ErrorCard(message: String) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.errorContainer
         )
