@@ -45,11 +45,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.talhapps.climabit.core.ui.components.weather.getWeatherDescription
+import com.talhapps.climabit.core.ui.components.weather.getWeatherIcon
 import com.talhapps.climabit.core.ui.mvi.useMvi
 import com.talhapps.climabit.domain.model.weather.AirQualityResponse
 import com.talhapps.climabit.domain.model.weather.OpenMeteoResponse
-import com.talhapps.climabit.presentation.dashboard.getWeatherDescription
-import com.talhapps.climabit.presentation.dashboard.getWeatherIcon
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone

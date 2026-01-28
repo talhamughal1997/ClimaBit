@@ -37,16 +37,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.talhapps.climabit.core.ui.components.aqi.getAQIInfo
+import com.talhapps.climabit.core.ui.components.weather.getWeatherDescription
+import com.talhapps.climabit.core.ui.components.weather.getWeatherIcon
 import com.talhapps.climabit.core.ui.mvi.useMvi
 import com.talhapps.climabit.domain.model.weather.AirQualityResponse
 import com.talhapps.climabit.domain.model.weather.OpenMeteoResponse
-import com.talhapps.climabit.presentation.dashboard.getWeatherDescription
-import com.talhapps.climabit.presentation.dashboard.getWeatherIcon
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -558,15 +558,3 @@ private data class WeatherDetail(
     val icon: androidx.compose.ui.graphics.vector.ImageVector
 )
 
-@Composable
-private fun getAQIInfo(aqi: Int): Pair<String, Color> {
-    val colorScheme = MaterialTheme.colorScheme
-    return when {
-        aqi <= 50 -> Pair("Good", colorScheme.primary)
-        aqi <= 100 -> Pair("Moderate", colorScheme.secondary)
-        aqi <= 150 -> Pair("Unhealthy for Sensitive", colorScheme.tertiary)
-        aqi <= 200 -> Pair("Unhealthy", colorScheme.error)
-        aqi <= 300 -> Pair("Very Unhealthy", colorScheme.errorContainer)
-        else -> Pair("Hazardous", colorScheme.error)
-    }
-}
