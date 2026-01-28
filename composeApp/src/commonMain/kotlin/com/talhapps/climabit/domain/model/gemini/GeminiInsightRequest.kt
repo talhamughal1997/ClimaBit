@@ -10,3 +10,4 @@ data class GeminiInsightRequest(
     val maxOutputTokens: Int = 2048
 )
 
+

@@ -6,9 +6,6 @@ import com.talhapps.climabit.domain.model.gemini.GeminiResponse
 import com.talhapps.climabit.domain.repository.GeminiRepository
 import kotlinx.coroutines.flow.Flow
 
-/**
- * Implementation of GeminiRepository
- */
 class GeminiRepositoryImpl(
     private val geminiApi: GeminiApi
 ) : GeminiRepository {
@@ -27,4 +24,5 @@ class GeminiRepositoryImpl(
         return geminiApi.generateContent(request, model)
     }
 }
+
 

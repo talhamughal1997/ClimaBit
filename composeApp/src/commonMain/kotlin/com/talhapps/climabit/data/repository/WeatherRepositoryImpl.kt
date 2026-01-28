@@ -12,14 +12,12 @@ import kotlinx.coroutines.flow.flowOf
 class WeatherRepositoryImpl(val weatherApi: WeatherApi): WeatherRepository {
     override fun getData() = flowOf("Hello Weather Repository Impl")
 
-    // Weather Forecast
     override fun getCurrentWeatherData(lat: Double, lng: Double): Flow<OpenMeteoResponse> =
         weatherApi.getCurrentWeatherByCoordinates(lat = lat, lon = lng, timezone = "auto")
 
     override fun getOneCall(lat: Double, lng: Double): Flow<OpenMeteoResponse> =
         weatherApi.getOneCall(lat = lat, lon = lng, timezone = "auto", forecastDays = 7)
 
-    // Historical Weather
     override fun getHistoricalWeather(
         lat: Double,
         lng: Double,
@@ -34,14 +32,12 @@ class WeatherRepositoryImpl(val weatherApi: WeatherApi): WeatherRepository {
             timezone = "auto"
         )
 
-    // Air Quality
     override fun getCurrentAirQuality(lat: Double, lng: Double): Flow<AirQualityResponse> =
         weatherApi.getCurrentAirQuality(lat = lat, lon = lng, timezone = "auto")
 
     override fun getAirQualityForecast(lat: Double, lng: Double): Flow<AirQualityResponse> =
         weatherApi.getAirQualityForecast(lat = lat, lon = lng, timezone = "auto", forecastDays = 3)
 
-    // Geocoding
     override fun searchLocations(name: String, count: Int): Flow<List<GeocodingResponse>> =
         weatherApi.searchLocations(name = name, count = count, language = "en", format = "json")
 

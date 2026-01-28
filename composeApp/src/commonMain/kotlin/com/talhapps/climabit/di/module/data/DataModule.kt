@@ -58,7 +58,6 @@ val dataModule = module {
         )
     }
 
-    // Gemini API
     single<GeminiApi> {
         GeminiApiImpl(
             client = get()

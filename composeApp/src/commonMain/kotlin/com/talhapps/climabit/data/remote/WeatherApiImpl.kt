@@ -14,11 +14,6 @@ import io.ktor.http.takeFrom
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-/**
- * Implementation backed by Open-Meteo Weather Forecast API.
- *
- * Base docs: https://open-meteo.com/en/docs
- */
 class WeatherApiImpl(
     private val client: HttpClient,
     private val baseUrl: String = DEFAULT_BASE_URL
@@ -36,7 +31,6 @@ class WeatherApiImpl(
                 parameter("latitude", lat)
                 parameter("longitude", lon)
                 parameter("timezone", timezone)
-                // Current weather variables
                 parameter(
                     "current",
                     "temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,rain,showers,snowfall,weather_code,cloud_cover,pressure_msl,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m"
@@ -59,17 +53,14 @@ class WeatherApiImpl(
                 parameter("longitude", lon)
                 parameter("timezone", timezone)
                 parameter("forecast_days", forecastDays.coerceIn(1, 16))
-                // Current weather
                 parameter(
                     "current",
                     "temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,rain,showers,snowfall,weather_code,cloud_cover,pressure_msl,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m"
                 )
-                // Hourly weather variables
                 parameter(
                     "hourly",
                     "temperature_2m,relative_humidity_2m,apparent_temperature,precipitation_probability,precipitation,rain,showers,snowfall,weather_code,cloud_cover,pressure_msl,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m,is_day"
                 )
-                // Daily weather variables
                 parameter(
                     "daily",
                     "weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,sunrise,sunset,daylight_duration,sunshine_duration,uv_index_max,precipitation_sum,rain_sum,showers_sum,snowfall_sum,precipitation_hours,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant"

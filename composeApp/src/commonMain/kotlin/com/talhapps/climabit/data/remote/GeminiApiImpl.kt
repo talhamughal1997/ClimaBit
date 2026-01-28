@@ -14,10 +14,6 @@ import io.ktor.http.path
 import io.ktor.http.takeFrom
 import kotlinx.coroutines.flow.Flow
 
-/**
- * Gemini API Implementation using Ktor
- * Docs: https://ai.google.dev/api/rest
- */
 class GeminiApiImpl(
     private val client: HttpClient,
     private val baseUrl: String = DEFAULT_GEMINI_BASE_URL
@@ -66,4 +62,5 @@ class GeminiApiImpl(
         private const val DEFAULT_GEMINI_BASE_URL = "https://generativelanguage.googleapis.com"
     }
 }
+
 
