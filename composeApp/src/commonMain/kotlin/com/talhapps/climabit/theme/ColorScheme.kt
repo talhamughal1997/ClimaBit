@@ -3,9 +3,6 @@ package com.talhapps.climabit.theme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 
-/**
- * Light color scheme for Material 3
- */
 internal val lightScheme = lightColorScheme(
     primary = primaryLight,
     onPrimary = onPrimaryLight,

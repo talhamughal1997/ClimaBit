@@ -3,21 +3,12 @@ package com.talhapps.climabit.domain.model.weather
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-/**
- * Open-Meteo Geocoding API Response
- * Docs: https://open-meteo.com/en/docs/geocoding-api
- *
- * The API returns a wrapper object with a "results" array
- */
 @Serializable
 data class GeocodingApiResponse(
     @SerialName("results") val results: List<GeocodingResponse> = emptyList(),
     @SerialName("generationtime_ms") val generationTimeMs: Double? = null
 )
 
-/**
- * Individual geocoding result
- */
 @Serializable
 data class GeocodingResponse(
     @SerialName("id") val id: Int? = null,

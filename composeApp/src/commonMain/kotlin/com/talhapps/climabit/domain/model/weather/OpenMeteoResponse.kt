@@ -3,10 +3,6 @@ package com.talhapps.climabit.domain.model.weather
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-/**
- * Open-Meteo Weather Forecast API Response
- * Docs: https://open-meteo.com/en/docs
- */
 @Serializable
 data class OpenMeteoResponse(
     @SerialName("latitude") val latitude: Double? = null,

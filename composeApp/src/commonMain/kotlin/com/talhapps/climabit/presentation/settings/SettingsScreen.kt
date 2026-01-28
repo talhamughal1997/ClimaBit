@@ -38,7 +38,7 @@ fun SettingsScreen(
         onEffect = { effect ->
             when (effect) {
                 is SettingsEffect.ShowMessage -> {
-                    // Handle message
+
                 }
             }
         }

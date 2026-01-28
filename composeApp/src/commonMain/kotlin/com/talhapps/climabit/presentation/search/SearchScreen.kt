@@ -51,7 +51,7 @@ fun SearchScreen(
                     onLocationSelected(effect.location)
                 }
                 is SearchEffect.ShowError -> {
-                    // Handle error
+
                 }
             }
         }
@@ -71,7 +71,7 @@ fun SearchScreen(
                 .padding(paddingValues)
                 .consumeWindowInsets(paddingValues)
         ) {
-            // Search Bar
+
             OutlinedTextField(
                 value = searchQuery,
                 shape = MaterialTheme.shapes.large,
@@ -87,7 +87,7 @@ fun SearchScreen(
                 singleLine = true
             )
 
-            // Results
+
             if (state.isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),

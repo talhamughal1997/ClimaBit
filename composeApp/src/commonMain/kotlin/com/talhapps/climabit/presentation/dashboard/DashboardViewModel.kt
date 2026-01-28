@@ -13,9 +13,6 @@ import com.talhapps.climabit.domain.usecase.weather.GetOneCallUseCase
 import com.talhapps.climabit.domain.usecase.weather.GetReverseGeocodingUseCase
 import kotlinx.coroutines.launch
 
-/**
- * Dashboard UI State
- */
 data class DashboardState(
     val isLoading: Boolean = false,
     val weather: OpenMeteoResponse? = null,
@@ -24,9 +21,6 @@ data class DashboardState(
     val error: String? = null
 ) : UiState
 
-/**
- * Dashboard Intents
- */
 sealed interface DashboardIntent : UiIntent {
     object LoadWeather : DashboardIntent
     object RefreshWeather : DashboardIntent
@@ -34,18 +28,12 @@ sealed interface DashboardIntent : UiIntent {
     data class LoadWeatherByLocation(val lat: Double, val lon: Double) : DashboardIntent
 }
 
-/**
- * Dashboard Effects
- */
 sealed interface DashboardEffect : UiEffect {
     data class ShowError(val message: String) : DashboardEffect
     data class ShowMessage(val message: String) : DashboardEffect
     object NavigateToSettings : DashboardEffect
 }
 
-/**
- * Dashboard ViewModel using MVI architecture
- */
 class DashboardViewModel(
     private val getCurrentWeatherDataUseCase: GetCurrentWeatherDataUseCase,
     private val getOneCallUseCase: GetOneCallUseCase,
@@ -55,14 +43,13 @@ class DashboardViewModel(
 ) {
 
     init {
-        // Load initial weather data for Karachi
         handleIntent(DashboardIntent.LoadWeatherByLocation(24.8607, 67.0011))
     }
 
     override fun onIntent(intent: DashboardIntent) {
         when (intent) {
             is DashboardIntent.LoadWeather -> {
-                loadWeather(24.8607, 67.0011) // Default: Karachi
+                loadWeather(24.8607, 67.0011)
             }
 
             is DashboardIntent.RefreshWeather -> {
@@ -91,7 +78,6 @@ class DashboardViewModel(
         viewModelScope.launch {
             updateState { copy(isLoading = true, error = null) }
 
-            // Load current weather
             getCurrentWeatherDataUseCase(WeatherRequest(lat = lat, lng = lon))
                 .observe(
                     onLoading = { updateState { copy(isLoading = true) } },
@@ -115,7 +101,6 @@ class DashboardViewModel(
                     }
                 )
 
-            // Load OneCall data for hourly forecast
             getOneCallUseCase(WeatherRequest(lat = lat, lng = lon))
                 .observe(
                     onLoading = {},
@@ -125,11 +110,9 @@ class DashboardViewModel(
                         }
                     },
                     onError = {
-                        // Don't show error for OneCall, just log it
                     }
                 )
 
-            // Load location name
             getReverseGeocodingUseCase(WeatherRequest(lat = lat, lng = lon))
                 .observe(
                     onLoading = {},
@@ -137,7 +120,6 @@ class DashboardViewModel(
                         updateState { copy(location = location) }
                     },
                     onError = {
-                        // Don't show error for geocoding
                     }
                 )
         }

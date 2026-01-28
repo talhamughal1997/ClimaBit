@@ -3,10 +3,6 @@ package com.talhapps.climabit.domain.model.weather
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-/**
- * Open-Meteo Air Quality API Response
- * Docs: https://open-meteo.com/en/docs/air-quality-api
- */
 @Serializable
 data class AirQualityResponse(
     @SerialName("latitude") val latitude: Double? = null,

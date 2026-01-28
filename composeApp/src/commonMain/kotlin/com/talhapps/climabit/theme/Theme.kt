@@ -6,17 +6,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 
-/**
- * ClimaBit Material 3 Theme with dark/light mode support and Poppins font.
- *
- * @param darkTheme Whether to use dark theme. If null, follows system preference.
- * @param dynamicColor Dynamic color is available on Android 12+ (currently disabled)
- * @param content The composable content to apply the theme to.
- */
 @Composable
 fun ClimaBitTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {

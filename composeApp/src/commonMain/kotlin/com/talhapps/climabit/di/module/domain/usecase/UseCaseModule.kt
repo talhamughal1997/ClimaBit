@@ -22,18 +22,14 @@ expect val platformUseCaseModule: Module
 
 val useCaseModule = module {
 
-    // Weather Forecast
     singleOf(::GetCurrentWeatherDataUseCase).bind<UseCase<WeatherRequest, OpenMeteoResponse>>()
     singleOf(::GetOneCallUseCase).bind<UseCase<WeatherRequest, OpenMeteoResponse>>()
 
-    // Air Quality
     singleOf(::GetAirQualityUseCase).bind<UseCase<WeatherRequest, AirQualityResponse>>()
 
-    // Geocoding
     singleOf(::GetGeocodingUseCase).bind<UseCase<String, List<GeocodingResponse>>>()
     singleOf(::GetReverseGeocodingUseCase).bind<UseCase<WeatherRequest, GeocodingResponse?>>()
 
-    // Gemini AI
     singleOf(::GetGeminiInsightsUseCase).bind<UseCase<GeminiInsightRequest, GeminiResponse>>()
 
 }

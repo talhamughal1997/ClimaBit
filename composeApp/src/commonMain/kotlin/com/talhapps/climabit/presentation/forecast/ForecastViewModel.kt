@@ -19,7 +19,7 @@ data class ForecastState(
     val forecast: OpenMeteoResponse? = null,
     val airQuality: AirQualityResponse? = null,
     val location: GeocodingResponse? = null,
-    val selectedDayIndex: Int = 1, // 1 = tomorrow (first day after today, index 0 is today)
+    val selectedDayIndex: Int = 1,
     val error: String? = null
 ) : UiState
 
@@ -90,7 +90,6 @@ class ForecastViewModel(
             var airQualityLoaded = false
             var locationLoaded = false
 
-            // Load forecast
             getOneCallUseCase(WeatherRequest(lat = lat, lng = lon))
                 .observe(
                     onLoading = { updateState { copy(isLoading = true) } },
@@ -116,7 +115,6 @@ class ForecastViewModel(
                     }
                 )
 
-            // Load air quality
             getAirQualityUseCase(WeatherRequest(lat = lat, lng = lon))
                 .observe(
                     onLoading = {},
@@ -137,7 +135,6 @@ class ForecastViewModel(
                     }
                 )
 
-            // Load location
             getReverseGeocodingUseCase(WeatherRequest(lat = lat, lng = lon))
                 .observe(
                     onLoading = {},

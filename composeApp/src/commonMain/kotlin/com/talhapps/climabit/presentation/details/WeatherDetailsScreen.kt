@@ -83,7 +83,7 @@ fun WeatherDetailsScreen(
         onEffect = { effect ->
             when (effect) {
                 is WeatherDetailsEffect.ShowError -> {
-                    // Handle error
+
                 }
             }
         }
@@ -134,33 +134,33 @@ fun WeatherDetailsScreen(
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 state.weather?.let { weather ->
-                    // Hero Section with Temperature and Icon
+
                     item {
                         WeatherHeroSection(weather = weather)
                     }
 
-                    // Additional Info
+
                     item {
                         AdditionalInfo(weather)
                     }
-                    // AQI Section with Progress
+
                     item {
                         state.airQuality?.let { airQuality ->
                             AQIProgressSection(airQuality = airQuality)
                         }
                     }
 
-                    // Key Metrics Row
+
                     item {
                         KeyMetricsRow(weather = weather)
                     }
 
-                    // Detailed Weather Information
+
                     item {
                         DetailedWeatherSection(weather = weather)
                     }
 
-                    // Sun Times Section
+
                     item {
                         weather.daily?.let { daily ->
                             SunTimesSection(
@@ -172,7 +172,7 @@ fun WeatherDetailsScreen(
                     }
                 }
 
-                // 7-Day Forecast Section
+
                 state.weather?.daily?.let { daily ->
                     item {
                         Text(
@@ -222,16 +222,16 @@ private fun WeatherHeroSection(weather: OpenMeteoResponse) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Left: Weather Icon
+
             weatherIcon?.let { icon ->
                 AsyncImage(
-                    model = "https://openweathermap.org/img/wn/${icon}@4x.png",
+                    model = "https:
                     contentDescription = description,
                     modifier = Modifier.size(120.dp)
                 )
             }
 
-            // Center: Temperature and Description
+
             Column(
                 modifier = Modifier.weight(1f).padding(horizontal = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -377,7 +377,7 @@ private fun AQIProgressSection(airQuality: AirQualityResponse) {
                 )
             }
 
-            // Progress Indicator
+
             LinearProgressIndicator(
                 progress = { progress.toFloat() },
                 modifier = Modifier
@@ -387,7 +387,7 @@ private fun AQIProgressSection(airQuality: AirQualityResponse) {
                 trackColor = aqiColor.copy(alpha = 0.2f)
             )
 
-            // Additional AQI metrics
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -428,7 +428,7 @@ private fun KeyMetricsRow(weather: OpenMeteoResponse) {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // Pressure Card
+
         current?.pressureMsl?.let { pressure ->
             MetricCard(
                 modifier = Modifier.weight(1f),
@@ -439,7 +439,7 @@ private fun KeyMetricsRow(weather: OpenMeteoResponse) {
             )
         }
 
-        // UV Index Card
+
         uvIndex?.let { uv ->
             MetricCard(
                 modifier = Modifier.weight(1f),
@@ -450,7 +450,7 @@ private fun KeyMetricsRow(weather: OpenMeteoResponse) {
             )
         }
 
-        // Cloud Cover Card
+
         current?.cloudCover?.let { clouds ->
             MetricCard(
                 modifier = Modifier.weight(1f),
@@ -542,7 +542,7 @@ private fun DetailedWeatherSection(weather: OpenMeteoResponse) {
             )
 
 
-            // Humidity with Progress
+
             current?.relativeHumidity2m?.let { humidity ->
                 DetailRowWithProgress(
                     icon = Icons.Default.WaterDrop,
@@ -552,7 +552,7 @@ private fun DetailedWeatherSection(weather: OpenMeteoResponse) {
                 )
             }
 
-            // Wind Speed and Direction
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -573,7 +573,7 @@ private fun DetailedWeatherSection(weather: OpenMeteoResponse) {
                 }
             }
 
-            // Wind Gusts
+
             current?.windGusts10m?.let { gusts ->
                 DetailItem(
                     icon = Icons.Default.ShutterSpeed,
@@ -773,16 +773,16 @@ private fun EnhancedForecastDayCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Weather Icon
+
             weatherIcon?.let { icon ->
                 AsyncImage(
-                    model = "https://openweathermap.org/img/wn/${icon}@2x.png",
+                    model = "https:
                     contentDescription = weatherDescription,
                     modifier = Modifier.size(56.dp)
                 )
             } ?: Spacer(modifier = Modifier.size(56.dp))
 
-            // Day info
+
             Column(
                 modifier = Modifier.weight(1f).padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -817,7 +817,7 @@ private fun EnhancedForecastDayCard(
                 }
             }
 
-            // Temperature range
+
             Column(
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.spacedBy(4.dp)

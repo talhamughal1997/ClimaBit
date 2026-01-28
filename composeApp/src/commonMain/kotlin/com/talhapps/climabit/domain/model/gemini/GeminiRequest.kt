@@ -3,10 +3,6 @@ package com.talhapps.climabit.domain.model.gemini
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-/**
- * Gemini API Request Model
- * Docs: https://ai.google.dev/api/rest
- */
 @Serializable
 data class GeminiRequest(
     @SerialName("contents") val contents: List<Content>,

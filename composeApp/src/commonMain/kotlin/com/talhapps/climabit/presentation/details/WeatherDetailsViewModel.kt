@@ -56,7 +56,6 @@ class WeatherDetailsViewModel(
 
     private fun loadDetails(lat: Double, lon: Double, location: GeocodingResponse?) {
         viewModelScope.launch {
-            // Set location immediately if provided (from search)
             if (location != null) {
                 updateState { copy(location = location) }
             }
@@ -73,7 +72,6 @@ class WeatherDetailsViewModel(
             var weatherLoaded = false
             var airQualityLoaded = false
 
-            // Load weather forecast
             getOneCallUseCase(WeatherRequest(lat = lat, lng = lon))
                 .observe(
                     onLoading = { updateState { copy(isLoadingWeather = true) } },
@@ -100,7 +98,6 @@ class WeatherDetailsViewModel(
                     }
                 )
 
-            // Load air quality
             getAirQualityUseCase(WeatherRequest(lat = lat, lng = lon))
                 .observe(
                     onLoading = { updateState { copy(isLoadingAirQuality = true) } },
@@ -125,7 +122,6 @@ class WeatherDetailsViewModel(
                     }
                 )
 
-            // Load location name only if not provided from search
             if (location == null) {
                 getReverseGeocodingUseCase(WeatherRequest(lat = lat, lng = lon))
                     .observe(
@@ -134,7 +130,6 @@ class WeatherDetailsViewModel(
                             updateState { copy(location = fetchedLocation) }
                         },
                         onError = {
-                            // Don't show error for geocoding
                         }
                     )
             }

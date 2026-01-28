@@ -3,10 +3,6 @@ package com.talhapps.climabit.domain.model.gemini
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-/**
- * Gemini API Response Model
- * Docs: https://ai.google.dev/api/rest
- */
 @Serializable
 data class GeminiResponse(
     @SerialName("candidates") val candidates: List<Candidate>? = null,
@@ -59,9 +55,6 @@ data class GeminiResponse(
         @SerialName("status") val status: String? = null
     )
 
-    /**
-     * Extract the generated text from the response
-     */
     fun getText(): String? {
         return candidates?.firstOrNull()?.content?.parts?.firstOrNull()?.text
     }

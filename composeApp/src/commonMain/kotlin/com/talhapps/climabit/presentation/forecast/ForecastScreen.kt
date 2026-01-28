@@ -66,7 +66,7 @@ fun ForecastScreen(
         onEffect = { effect ->
             when (effect) {
                 is ForecastEffect.ShowError -> {
-                    // Handle error
+
                 }
 
                 is ForecastEffect.NavigateToDetails -> {
@@ -107,7 +107,7 @@ private fun ForecastContent(
                 title = {
                     Column {
                         Text("7-Day Forecast")
-                        // Location name
+
                         state.location?.let { location ->
                             Text(
                                 text = "${location.name ?: ""}${if (location.country != null) ", ${location.country}" else ""}",
@@ -150,7 +150,7 @@ private fun ForecastContent(
                     val selectedIndex = state.selectedDayIndex
                     val dailyData = forecast.daily
 
-                    // Selected Day Weather Card
+
                     item {
                         SelectedDayWeatherCard(
                             forecast = forecast,
@@ -158,7 +158,7 @@ private fun ForecastContent(
                         )
                     }
 
-                    // AQI Card
+
                     item {
                         Row(modifier = Modifier.fillMaxWidth()) {
                             state.airQuality?.let { airQuality ->
@@ -169,7 +169,7 @@ private fun ForecastContent(
                                 )
                             }
 
-                            //Weather Info
+
                             WeatherInfoCard(
                                 modifier = Modifier.weight(1f),
                                 weatherCode = dailyData?.weatherCode?.getOrNull(selectedIndex),
@@ -181,17 +181,9 @@ private fun ForecastContent(
                         }
                     }
 
-                    // Weather Info
-//                    item {
-//                        WeatherInfoCard(
-//                            weatherCode = dailyData?.weatherCode?.getOrNull(selectedIndex),
-//                            description = getWeatherDescription(
-//                                dailyData?.weatherCode?.getOrNull(selectedIndex)
-//                            )
-//                        )
-//                    }
 
-                    // Day Selection Tab Bar
+
+
                     item {
                         DaySelectionTabBar(
                             forecast = forecast,
@@ -200,7 +192,7 @@ private fun ForecastContent(
                         )
                     }
 
-                    // Weather Details Grid
+
                     item {
                         WeatherDetailsGrid(
                             forecast = forecast,
@@ -269,7 +261,7 @@ private fun SelectedDayWeatherCard(
 
                 weatherIcon?.let { icon ->
                     AsyncImage(
-                        model = "https://openweathermap.org/img/wn/${icon}@4x.png",
+                        model = "https:
                         contentDescription = getWeatherDescription(weatherCode),
                         modifier = Modifier.size(140.dp)
                     )
@@ -381,9 +373,9 @@ private fun DaySelectionTabBar(
     val timeZone = TimeZone.of(forecast.timezone ?: "UTC")
     val today = Clock.System.now().toLocalDateTime(timeZone).date
 
-    // Get days starting from tomorrow (index 1) to 7 days
+
     val days = dailyData?.time?.take(7)?.mapIndexedNotNull { index, dateStr ->
-        if (index == 0) null else { // Skip today
+        if (index == 0) null else { 
             try {
                 val date = LocalDate.parse(dateStr)
                 val dayName = when {
@@ -391,7 +383,7 @@ private fun DaySelectionTabBar(
                     else -> {
                         date.dayOfWeek.name.lowercase()
                             .replaceFirstChar { it.uppercaseChar() }
-                            .take(3) // Short form: Mon, Tue, etc.
+                            .take(3) 
                     }
                 }
                 Pair(index, dayName)
@@ -451,11 +443,11 @@ private fun WeatherDetailsGrid(
     val currentData = forecast.current
 
     val feelsLike = dailyData?.apparentTemperatureMax?.getOrNull(dayIndex)
-    // Use hourly data for humidity (get max from hourly data for the selected day)
+
     val humidity = if (dayIndex == 0 && currentData != null) {
         currentData.relativeHumidity2m
     } else {
-        // Get max humidity from hourly data for the selected day (24 hours per day)
+
         hourlyData?.relativeHumidity2m?.let { humidityList ->
             val startIndex = dayIndex * 24
             val endIndex = minOf(startIndex + 24, humidityList.size)
@@ -467,11 +459,11 @@ private fun WeatherDetailsGrid(
     val rainChance = dailyData?.precipitationProbabilityMax?.getOrNull(dayIndex)
     val windSpeed = dailyData?.windSpeed10mMax?.getOrNull(dayIndex)
     val uvIndex = dailyData?.uvIndexMax?.getOrNull(dayIndex)
-    // Use hourly data for pressure (get average from hourly data for the selected day)
+
     val pressure = if (dayIndex == 0 && currentData != null) {
         currentData.pressureMsl
     } else {
-        // Get average pressure from hourly data for the selected day
+
         hourlyData?.pressureMsl?.let { pressureList ->
             val startIndex = dayIndex * 24
             val endIndex = minOf(startIndex + 24, pressureList.size)
@@ -499,7 +491,7 @@ private fun WeatherDetailsGrid(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
 
-        // Grid layout (2 columns)
+
         details.chunked(2).forEach { rowItems ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -511,7 +503,7 @@ private fun WeatherDetailsGrid(
                         detail = detail
                     )
                 }
-                // Fill empty space if odd number of items
+
                 if (rowItems.size == 1) {
                     Spacer(modifier = Modifier.weight(1f))
                 }

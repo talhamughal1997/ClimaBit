@@ -6,9 +6,6 @@ import com.talhapps.climabit.domain.model.gemini.GeminiResponse
 import com.talhapps.climabit.domain.repository.GeminiRepository
 import kotlinx.coroutines.flow.flowOf
 
-/**
- * Use case for generating insights using Gemini API
- */
 class GetGeminiInsightsUseCase(
     private val geminiRepository: GeminiRepository
 ) : UseCase<GeminiInsightRequest, GeminiResponse> {

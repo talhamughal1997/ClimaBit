@@ -54,11 +54,9 @@ fun DashboardScreen(
         viewModel = viewModel, initialIntent = DashboardIntent.LoadWeather, onEffect = { effect ->
             when (effect) {
                 is DashboardEffect.ShowError -> {
-                    // Handle error (could show snackbar)
                 }
 
                 is DashboardEffect.ShowMessage -> {
-                    // Handle message
                 }
 
                 is DashboardEffect.NavigateToSettings -> {
@@ -90,7 +88,7 @@ private fun DashboardContent(
     onLocationClick: () -> Unit,
     onSettingsClick: () -> Unit
 ) {
-    // Pull to refresh state
+
     val pullRefreshState = rememberPullToRefreshState()
 
     Scaffold(
@@ -113,7 +111,7 @@ private fun DashboardContent(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Header
+
                 item {
                     val locationName = state.location?.name
                         ?: "${state.weather?.timezone}"
@@ -130,16 +128,16 @@ private fun DashboardContent(
                     )
                 }
 
-                // Error State
+
                 state.error?.let { error ->
                     item {
                         ErrorCard(message = error)
                     }
                 }
 
-                // Weather Content
+
                 state.weather?.let { weather ->
-                    // Main Weather Card (clickable to show details)
+
                     item {
                         MainWeatherCard(
                             weather = weather,
@@ -148,7 +146,7 @@ private fun DashboardContent(
                         )
                     }
 
-                    // Today's Forecast Section
+
                     state.oneCallData?.hourly?.let { hourlyData ->
                         item {
                             TodayForecastSection(
@@ -160,12 +158,12 @@ private fun DashboardContent(
                         }
                     }
 
-                    // Weather Details Grid
+
                     item {
                         WeatherDetailsGrid(weather = weather)
                     }
 
-                    // Additional Info
+
                     item {
                         AdditionalInfoCard(weather = weather)
                     }
@@ -246,19 +244,13 @@ private fun MainWeatherCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // Weather Description (using weather code)
+
                 val weatherCode = weather.current?.weatherCode
                 getWeatherDescription(weatherCode)
-                val weatherIcon =
-                    getWeatherIcon(weatherCode, weather.hourly?.isDay?.getOrNull(0) ?: 1)
-//            Text(
-//                text = weatherDescription,
-//                style = MaterialTheme.typography.titleMedium,
-//                color = MaterialTheme.colorScheme.onPrimaryContainer
-//            )
+                getWeatherIcon(weatherCode, weather.hourly?.isDay?.getOrNull(0) ?: 1)
 
                 AsyncImage(
-                    model = "https://openweathermap.org/img/wn/${weatherIcon}@4x.png",
+                    model = "https:
                     contentDescription = getWeatherDescription(weatherCode),
                     modifier = Modifier.size(100.dp)
                 )
@@ -268,7 +260,7 @@ private fun MainWeatherCard(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Temperature
+
                     weather.current?.temperature2m?.let { temp ->
                         Text(
                             text = "${temp.toInt()}°C",
@@ -279,7 +271,7 @@ private fun MainWeatherCard(
                     }
 
 
-                    // Feels Like
+
                     weather.current?.apparentTemperature?.let { feelsLike ->
                         Text(
                             text = "Feels like ${feelsLike.toInt()}°",
@@ -290,7 +282,7 @@ private fun MainWeatherCard(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Min/Max Temperature for today (from oneCallData which has daily forecast)
+
                     Row(
                         modifier = Modifier.align(Alignment.End),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -348,28 +340,28 @@ private fun WeatherDetailsGrid(weather: OpenMeteoResponse) {
             maxItemsInEachRow = 2,
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Humidity
+
             WeatherDetailCard(
                 modifier = Modifier.weight(1f),
                 title = "Humidity",
                 value = "${weather.current?.relativeHumidity2m ?: 0}%"
             )
 
-            // Pressure
+
             WeatherDetailCard(
                 modifier = Modifier.weight(1f),
                 title = "Pressure",
                 value = "${weather.current?.pressureMsl?.toInt() ?: 0} hPa"
             )
 
-            // Wind Speed
+
             WeatherDetailCard(
                 modifier = Modifier.weight(1f),
                 title = "Wind Speed",
                 value = "${weather.current?.windSpeed10m ?: 0.0} km/h"
             )
 
-            // Wind Direction
+
             WeatherDetailCard(
                 modifier = Modifier.weight(1f),
                 title = "Wind Direction",
@@ -429,21 +421,21 @@ private fun AdditionalInfoCard(weather: OpenMeteoResponse) {
             maxItemsInEachRow = 2,
         ) {
 
-            // Cloud Coverage
+
             weather.current?.cloudCover?.let { clouds ->
                 InfoRow(
                     modifier = Modifier.weight(1f), label = "Cloud Coverage", value = "$clouds%"
                 )
             }
 
-            // Wind Direction
+
             weather.current?.windDirection10m?.let { deg ->
                 InfoRow(
                     modifier = Modifier.weight(1f), label = "Wind Direction", value = "${deg}°"
                 )
             }
 
-            // Wind Gust
+
             weather.current?.windGusts10m?.let { gust ->
                 InfoRow(
                     modifier = Modifier.weight(1f), label = "Wind Gust", value = "$gust km/h"

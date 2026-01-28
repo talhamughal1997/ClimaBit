@@ -65,45 +65,24 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
-/**
- * Base route interface for Navigation 3.
- */
 @Serializable
 private sealed interface Route
 
-/**
- * Top level routes that appear in the navigation bar.
- */
 @Serializable
 private sealed interface TopLevelRoute : Route
 
-/**
- * Dashboard route - main weather screen.
- */
 @Serializable
 private data object Dashboard : TopLevelRoute
 
-/**
- * Forecast route - 7-day forecast screen.
- */
 @Serializable
 private data object Forecast : TopLevelRoute
 
-/**
- * Search route - location search screen.
- */
 @Serializable
 private data object Search : TopLevelRoute
 
-/**
- * Settings route - app settings screen.
- */
 @Serializable
 private data object Settings : Route
 
-/**
- * Weather details route with location parameters.
- */
 @Serializable
 private data class WeatherDetails(
     val lat: Double,
@@ -112,19 +91,10 @@ private data class WeatherDetails(
     val locationCountry: String? = null
 ) : Route
 
-/**
- * List of top level routes for navigation bar.
- */
 private val topLevelRoutes: List<TopLevelRoute> = listOf(Dashboard, Forecast, Search)
 
-/**
- * Animation duration for navigation transitions.
- */
 private const val NAVIGATION_ANIMATION_DURATION = 300
 
-/**
- * Forward navigation transition - slides in from right, fades in.
- */
 private fun forwardTransitionSpec() = slideInHorizontally(
     initialOffsetX = { fullWidth -> fullWidth }, animationSpec = tween(
         durationMillis = NAVIGATION_ANIMATION_DURATION, easing = FastOutSlowInEasing
@@ -144,9 +114,6 @@ private fun forwardTransitionSpec() = slideInHorizontally(
 )
 
 
-/**
- * Back navigation transition - slides in from left, fades in.
- */
 private fun backTransitionSpec() = slideInHorizontally(
     initialOffsetX = { fullWidth -> -fullWidth }, animationSpec = tween(
         durationMillis = NAVIGATION_ANIMATION_DURATION, easing = FastOutSlowInEasing
@@ -166,10 +133,6 @@ private fun backTransitionSpec() = slideInHorizontally(
 )
 
 
-/**
- * Predictive back navigation transition - scales and fades out.
- * Used for Android's predictive back gesture.
- */
 private fun predictiveBackTransitionSpec() = scaleIn(
     initialScale = 0.95f, animationSpec = tween(
         durationMillis = NAVIGATION_ANIMATION_DURATION, easing = FastOutSlowInEasing
@@ -189,45 +152,37 @@ private fun predictiveBackTransitionSpec() = scaleIn(
 )
 
 
-/**
- * Navigation 3 implementation with adaptive layout support.
- * Uses NavDisplay with ListDetailSceneStrategy for tablet/mobile layouts.
- * Based on: https://johnoreilly.dev/posts/navigation3-cmp/
- */
 @OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun AppNavigation() {
-    // Back stack for Navigation 3 - using mutableStateListOf for state management
+
     val backStack: MutableList<Route> = remember {
         mutableStateListOf(Dashboard)
     }
 
     val coroutineScope = rememberCoroutineScope()
 
-    // Adaptive layout setup for tablet/mobile
+
     val windowAdaptiveInfo = currentWindowAdaptiveInfo()
     val directive = remember(windowAdaptiveInfo) {
         calculatePaneScaffoldDirective(windowAdaptiveInfo).copy(horizontalPartitionSpacerSize = 0.dp)
     }
     val listDetailStrategy = rememberListDetailSceneStrategy<Any>(directive = directive)
 
-    // Determine window size class for adaptive navigation
+
     val windowSizeClass = windowAdaptiveInfo.windowSizeClass
 
-    // Drawer state for extra large windows
+
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
-    // Determine navigation type based on window size using breakpoints
-    // COMPACT: < 600dp (BottomBar)
-    // MEDIUM: >= 600dp and < 840dp (Rail)
-    // EXPANDED: >= 840dp (Drawer)
+
     val navigationType = when {
         windowSizeClass.isWidthAtLeastBreakpoint(840) -> NavigationType.Drawer
         windowSizeClass.isWidthAtLeastBreakpoint(600) -> NavigationType.Rail
         else -> NavigationType.BottomBar
     }
 
-    // Navigation content
+
     val navigationContent: @Composable () -> Unit = {
         when (navigationType) {
             NavigationType.Drawer -> {
@@ -253,7 +208,7 @@ fun AppNavigation() {
         }
     }
 
-    // Main content
+
     val mainContent: @Composable () -> Unit = {
         NavDisplay(
             modifier = Modifier.fillMaxSize(),
@@ -264,7 +219,7 @@ fun AppNavigation() {
             popTransitionSpec = { backTransitionSpec() },
             predictivePopTransitionSpec = { predictiveBackTransitionSpec() },
             entryProvider = entryProvider {
-                // Dashboard entry with list/detail pane support
+
                 entry<Dashboard>(
                     metadata = ListDetailSceneStrategy.listPane(
                         detailPlaceholder = {
@@ -294,7 +249,7 @@ fun AppNavigation() {
                     })
                 }
 
-                // Forecast entry with list/detail pane support
+
                 entry<Forecast> {
                     ForecastScreen(
                         onForecastItemSelected = { lat, lon, locationName, locationCountry ->
@@ -309,7 +264,7 @@ fun AppNavigation() {
                         })
                 }
 
-                // Search entry
+
                 entry<Search> {
                     SearchScreen(
                         onLocationSelected = { location ->
@@ -324,12 +279,12 @@ fun AppNavigation() {
                         })
                 }
 
-                // Settings entry
+
                 entry<Settings> {
                     SettingsScreen()
                 }
 
-                // Weather Details entry (detail pane for tablet, full screen for mobile)
+
                 entry<WeatherDetails>(
                     metadata = ListDetailSceneStrategy.detailPane()
                 ) { key ->
@@ -343,7 +298,7 @@ fun AppNavigation() {
             })
     }
 
-    // Render based on navigation type
+
     when (navigationType) {
         NavigationType.Drawer -> {
             ModalNavigationDrawer(
@@ -418,40 +373,28 @@ fun AppNavigation() {
     }
 }
 
-/**
- * Enum for navigation types based on window size.
- */
 private enum class NavigationType {
-    BottomBar,  // Small windows (mobile)
-    Rail,       // Large windows (tablet)
-    Drawer      // Extra large windows (desktop)
+    BottomBar,
+    Rail,
+    Drawer      
 }
 
-/**
- * Route metadata for navigation display.
- */
 private data class RouteMetadata(
     val route: TopLevelRoute, val icon: ImageVector, val contentDescription: String
 )
 
-/**
- * Route metadata mapping.
- */
 private val routeMetadataMap = mapOf<TopLevelRoute, RouteMetadata>(
     Dashboard to RouteMetadata(Dashboard, Icons.Default.Home, "Dashboard"),
     Forecast to RouteMetadata(Forecast, Icons.Default.DateRange, "Forecast"),
     Search to RouteMetadata(Search, Icons.Default.Search, "Search")
 )
 
-/**
- * Bottom navigation bar for small windows (mobile).
- */
 @Composable
 private fun ClimaBitBottomNavigation(
     topLevelRoutes: List<TopLevelRoute>,
     backStack: MutableList<Route>
 ) {
-    // Get current route from back stack - observe changes
+
     val currentRoute = remember {
         derivedStateOf {
             backStack.lastOrNull() as? TopLevelRoute ?: Dashboard
@@ -478,15 +421,12 @@ private fun ClimaBitBottomNavigation(
     }
 }
 
-/**
- * Navigation rail for large windows (tablet).
- */
 @Composable
 private fun ClimaBitNavigationRail(
     topLevelRoutes: List<TopLevelRoute>,
     backStack: MutableList<Route>
 ) {
-    // Get current route from back stack - observe changes
+
     val currentRoute = remember {
         derivedStateOf {
             backStack.lastOrNull() as? TopLevelRoute ?: Dashboard
@@ -514,9 +454,6 @@ private fun ClimaBitNavigationRail(
     }
 }
 
-/**
- * Navigation drawer for extra large windows (desktop).
- */
 @Composable
 private fun ClimaBitNavigationDrawer(
     drawerState: DrawerState,
@@ -524,7 +461,7 @@ private fun ClimaBitNavigationDrawer(
     topLevelRoutes: List<TopLevelRoute>,
     backStack: MutableList<Route>
 ) {
-    // Get current route from back stack - observe changes
+
     val currentRoute = remember {
         derivedStateOf {
             backStack.lastOrNull() as? TopLevelRoute ?: Dashboard
@@ -540,7 +477,7 @@ private fun ClimaBitNavigationDrawer(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        // Header
+
         Text(
             text = "ClimaBit",
             style = MaterialTheme.typography.titleLarge,
@@ -548,7 +485,7 @@ private fun ClimaBitNavigationDrawer(
         )
 
 
-        // Top level routes
+
         topLevelRoutes.forEach { route ->
             val metadata = routeMetadataMap[route] ?: return@forEach
             NavigationDrawerItem(
@@ -572,7 +509,7 @@ private fun ClimaBitNavigationDrawer(
         }
 
 
-        // Settings
+
         NavigationDrawerItem(
             icon = {
                 Icon(

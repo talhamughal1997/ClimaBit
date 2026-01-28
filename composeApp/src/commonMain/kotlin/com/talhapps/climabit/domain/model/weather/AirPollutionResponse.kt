@@ -3,10 +3,6 @@ package com.talhapps.climabit.domain.model.weather
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-/**
- * Model for OpenWeather Air Pollution API.
- * Docs: https://openweathermap.org/api/air-pollution
- */
 @Serializable
 data class AirPollutionResponse(
     @SerialName("coord") val coord: Coordinates? = null,

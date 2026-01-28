@@ -3,10 +3,6 @@ package com.talhapps.climabit.theme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 
-/**
- * Material 3 Typography with Poppins font family.
- * Must be called from a @Composable context.
- */
 @Composable
 fun AppTypography(): Typography {
     val baseline = Typography()

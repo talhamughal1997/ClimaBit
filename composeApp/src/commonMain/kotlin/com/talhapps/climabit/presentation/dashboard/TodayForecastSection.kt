@@ -22,9 +22,6 @@ import coil3.compose.AsyncImage
 import com.talhapps.climabit.domain.model.weather.OpenMeteoResponse
 import kotlinx.datetime.LocalDateTime
 
-/**
- * Today's Forecast section displaying hourly weather data
- */
 @Composable
 fun TodayForecastSection(
     hourlyData: OpenMeteoResponse.HourlyData,
@@ -37,7 +34,6 @@ fun TodayForecastSection(
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
-        // Header
         Text(
             text = "Today's Forecast",
             style = MaterialTheme.typography.titleMedium,
@@ -46,7 +42,6 @@ fun TodayForecastSection(
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // Hourly forecast list
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(horizontal = 4.dp)
@@ -75,7 +70,6 @@ private fun HourlyForecastItem(
     timezone: String? = null
 ) {
     val time = try {
-        // Parse ISO8601 format: "2022-07-01T00:00"
         val normalizedTime = if (timeStr.length == 16) "${timeStr}:00" else timeStr
         val localDateTime = LocalDateTime.parse(normalizedTime)
         formatTime(localDateTime.hour, localDateTime.minute)
@@ -99,14 +93,12 @@ private fun HourlyForecastItem(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Time
             Text(
                 text = time,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            // Weather Icon
             if (weatherIcon != null) {
                 AsyncImage(
                     model = "https://openweathermap.org/img/wn/${weatherIcon}@2x.png",
@@ -117,7 +109,6 @@ private fun HourlyForecastItem(
                 Box(modifier = Modifier.size(40.dp))
             }
 
-            // Temperature
             Text(
                 text = tempDisplay,
                 style = MaterialTheme.typography.titleMedium,
@@ -128,9 +119,6 @@ private fun HourlyForecastItem(
     }
 }
 
-/**
- * Format time in 12-hour format (e.g., "6:00 AM", "12:00 PM")
- */
 private fun formatTime(hour: Int, minute: Int): String {
     val period = if (hour < 12) "AM" else "PM"
     val displayHour = when {
@@ -142,29 +130,23 @@ private fun formatTime(hour: Int, minute: Int): String {
     return "$displayHour$displayMinute $period"
 }
 
-/**
- * Get weather icon code from WMO weather code
- */
 fun getWeatherIcon(code: Int?, isDay: Int): String? {
     if (code == null) return null
     val dayNight = if (isDay == 1) "d" else "n"
     return when (code) {
-        0 -> "01$dayNight" // Clear sky
-        in 1..3 -> "02$dayNight" // Partly cloudy
-        45, 48 -> "50$dayNight" // Fog
-        in 51..57 -> "09$dayNight" // Drizzle
-        in 61..67 -> "10$dayNight" // Rain
-        in 71..77 -> "13$dayNight" // Snow
-        in 80..82 -> "09$dayNight" // Rain showers
-        in 85..86 -> "13$dayNight" // Snow showers
-        95, 96, 99 -> "11$dayNight" // Thunderstorm
+        0 -> "01$dayNight"
+        in 1..3 -> "02$dayNight"
+        45, 48 -> "50$dayNight"
+        in 51..57 -> "09$dayNight"
+        in 61..67 -> "10$dayNight"
+        in 71..77 -> "13$dayNight"
+        in 80..82 -> "09$dayNight"
+        in 85..86 -> "13$dayNight"
+        95, 96, 99 -> "11$dayNight"
         else -> "01$dayNight"
     }
 }
 
-/**
- * Get weather description from WMO weather code
- */
 fun getWeatherDescription(code: Int?): String {
     if (code == null) return "Unknown"
     return when (code) {

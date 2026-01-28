@@ -12,13 +12,6 @@ import climabit.composeapp.generated.resources.Res
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.Font
 
-/**
- * Poppins font family using TTF files from composeResources.
- * Works across all platforms (Android, iOS, Desktop, Web).
- *
- * This must be called from a @Composable context.
- */
-
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 fun PoppinsFontFamily(): FontFamily {

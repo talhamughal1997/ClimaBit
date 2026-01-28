@@ -3,11 +3,6 @@ package com.talhapps.climabit.domain.model.weather
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-/**
- * Open-Meteo Historical Weather API Response
- * Uses the same structure as OpenMeteoResponse but from archive-api.open-meteo.com
- * Docs: https://open-meteo.com/en/docs/historical-weather-api
- */
 @Serializable
 data class HistoricalWeatherResponse(
     @SerialName("latitude") val latitude: Double? = null,
