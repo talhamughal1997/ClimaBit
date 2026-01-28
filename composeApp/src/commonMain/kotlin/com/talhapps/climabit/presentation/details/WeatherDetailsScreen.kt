@@ -225,7 +225,7 @@ private fun WeatherHeroSection(weather: OpenMeteoResponse) {
 
             weatherIcon?.let { icon ->
                 AsyncImage(
-                    model = "https:
+                    model = "https://openweathermap.org/img/wn/${icon}@2x.png",
                     contentDescription = description,
                     modifier = Modifier.size(120.dp)
                 )
@@ -776,7 +776,7 @@ private fun EnhancedForecastDayCard(
 
             weatherIcon?.let { icon ->
                 AsyncImage(
-                    model = "https:
+                    model = "https://openweathermap.org/img/wn/${icon}@2x.png",
                     contentDescription = weatherDescription,
                     modifier = Modifier.size(56.dp)
                 )

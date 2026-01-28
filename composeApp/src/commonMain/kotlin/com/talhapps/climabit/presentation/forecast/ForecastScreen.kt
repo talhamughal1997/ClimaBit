@@ -261,7 +261,7 @@ private fun SelectedDayWeatherCard(
 
                 weatherIcon?.let { icon ->
                     AsyncImage(
-                        model = "https:
+                        model = "https://openweathermap.org/img/wn/${icon}@2x.png",
                         contentDescription = getWeatherDescription(weatherCode),
                         modifier = Modifier.size(140.dp)
                     )

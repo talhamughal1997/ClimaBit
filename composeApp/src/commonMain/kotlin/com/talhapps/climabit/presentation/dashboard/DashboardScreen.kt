@@ -246,12 +246,13 @@ private fun MainWeatherCard(
             ) {
 
                 val weatherCode = weather.current?.weatherCode
-                getWeatherDescription(weatherCode)
-                getWeatherIcon(weatherCode, weather.hourly?.isDay?.getOrNull(0) ?: 1)
+                val weatherDescription = getWeatherDescription(weatherCode)
+                val weatherIcon =
+                    getWeatherIcon(weatherCode, weather.hourly?.isDay?.getOrNull(0) ?: 1)
 
                 AsyncImage(
-                    model = "https:
-                    contentDescription = getWeatherDescription(weatherCode),
+                    model = "https://openweathermap.org/img/wn/${weatherIcon}@4x.png",
+                    contentDescription = weatherDescription,
                     modifier = Modifier.size(100.dp)
                 )
 
