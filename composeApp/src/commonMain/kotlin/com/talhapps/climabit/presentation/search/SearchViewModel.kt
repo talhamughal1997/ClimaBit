@@ -39,6 +39,7 @@ class SearchViewModel(
                     updateState { copy(results = emptyList()) }
                 }
             }
+
             is SearchIntent.SelectLocation -> {
                 sendEffect(SearchEffect.NavigateToDetails(intent.location))
             }

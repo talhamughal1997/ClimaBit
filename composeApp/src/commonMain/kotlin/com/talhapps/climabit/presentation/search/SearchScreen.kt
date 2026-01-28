@@ -50,6 +50,7 @@ fun SearchScreen(
                 is SearchEffect.NavigateToDetails -> {
                     onLocationSelected(effect.location)
                 }
+
                 is SearchEffect.ShowError -> {
 
                 }
@@ -75,7 +76,7 @@ fun SearchScreen(
             OutlinedTextField(
                 value = searchQuery,
                 shape = MaterialTheme.shapes.large,
-                onValueChange = { 
+                onValueChange = {
                     searchQuery = it
                     viewModel.handleIntent(SearchIntent.Search(it))
                 },

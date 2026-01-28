@@ -9,7 +9,7 @@ import com.talhapps.climabit.di.module.presentation.presentationModule
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
 
-fun initKoin(koinAppDeclaration: KoinAppDeclaration? = null){
+fun initKoin(koinAppDeclaration: KoinAppDeclaration? = null) {
     startKoin {
         koinAppDeclaration?.invoke(this)
         modules(

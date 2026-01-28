@@ -24,7 +24,7 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
-expect val platformDataModule : Module
+expect val platformDataModule: Module
 
 val dataModule = module {
 

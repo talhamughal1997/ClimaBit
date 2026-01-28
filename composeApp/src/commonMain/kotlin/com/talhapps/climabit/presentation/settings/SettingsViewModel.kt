@@ -1,11 +1,9 @@
 package com.talhapps.climabit.presentation.settings
 
-import androidx.lifecycle.viewModelScope
 import com.talhapps.climabit.core.ui.mvi.MviViewModel
 import com.talhapps.climabit.core.ui.mvi.UiEffect
 import com.talhapps.climabit.core.ui.mvi.UiIntent
 import com.talhapps.climabit.core.ui.mvi.UiState
-import kotlinx.coroutines.launch
 
 data class SettingsState(
     val temperatureUnit: String = "Celsius",
@@ -35,6 +33,7 @@ class SettingsViewModel() : MviViewModel<SettingsState, SettingsIntent, Settings
                     )
                 }
             }
+
             is SettingsIntent.ToggleWindSpeedUnit -> {
                 updateState {
                     copy(
@@ -42,6 +41,7 @@ class SettingsViewModel() : MviViewModel<SettingsState, SettingsIntent, Settings
                     )
                 }
             }
+
             is SettingsIntent.ToggleTheme -> {
                 updateState {
                     copy(isDarkTheme = !isDarkTheme)

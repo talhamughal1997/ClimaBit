@@ -9,7 +9,7 @@ import com.talhapps.climabit.domain.repository.WeatherRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
-class WeatherRepositoryImpl(val weatherApi: WeatherApi): WeatherRepository {
+class WeatherRepositoryImpl(val weatherApi: WeatherApi) : WeatherRepository {
     override fun getData() = flowOf("Hello Weather Repository Impl")
 
     override fun getCurrentWeatherData(lat: Double, lng: Double): Flow<OpenMeteoResponse> =

@@ -164,7 +164,6 @@ private fun DashboardContent(
 }
 
 
-
 @Composable
 private fun WeatherDetailsGrid(weather: OpenMeteoResponse) {
     Column(

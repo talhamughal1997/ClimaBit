@@ -375,7 +375,7 @@ private fun DaySelectionTabBar(
 
 
     val days = dailyData?.time?.take(7)?.mapIndexedNotNull { index, dateStr ->
-        if (index == 0) null else { 
+        if (index == 0) null else {
             try {
                 val date = LocalDate.parse(dateStr)
                 val dayName = when {
@@ -383,7 +383,7 @@ private fun DaySelectionTabBar(
                     else -> {
                         date.dayOfWeek.name.lowercase()
                             .replaceFirstChar { it.uppercaseChar() }
-                            .take(3) 
+                            .take(3)
                     }
                 }
                 Pair(index, dayName)

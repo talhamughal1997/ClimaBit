@@ -376,7 +376,7 @@ fun AppNavigation() {
 private enum class NavigationType {
     BottomBar,
     Rail,
-    Drawer      
+    Drawer
 }
 
 private data class RouteMetadata(

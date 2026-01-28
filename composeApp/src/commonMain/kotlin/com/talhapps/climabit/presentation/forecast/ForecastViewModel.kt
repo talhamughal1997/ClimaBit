@@ -55,12 +55,15 @@ class ForecastViewModel(
             is ForecastIntent.LoadForecast -> {
                 loadForecast(24.8607, 67.0011)
             }
+
             is ForecastIntent.LoadForecastByLocation -> {
                 loadForecast(intent.lat, intent.lon)
             }
+
             is ForecastIntent.SelectForecastItem -> {
                 fetchLocationAndNavigate(intent.lat, intent.lon)
             }
+
             is ForecastIntent.SelectDay -> {
                 updateState { copy(selectedDayIndex = intent.dayIndex) }
             }
