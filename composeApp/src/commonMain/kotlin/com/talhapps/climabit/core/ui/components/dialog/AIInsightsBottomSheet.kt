@@ -27,7 +27,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.talhapps.climabit.core.ui.util.MarkdownFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -116,9 +115,7 @@ fun AIInsightsBottomSheet(
                             MarkdownFormatter.formatMarkdownToAnnotatedString(insights)
                         Text(
                             text = formattedText,
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                lineHeight = 24.sp
-                            ),
+                            style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.wrapContentSize()
                         )
