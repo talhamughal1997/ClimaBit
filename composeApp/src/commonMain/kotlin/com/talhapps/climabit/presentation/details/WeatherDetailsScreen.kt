@@ -2,7 +2,6 @@ package com.talhapps.climabit.presentation.details
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -28,7 +27,6 @@ import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.filled.WbTwilight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -57,6 +55,7 @@ import com.talhapps.climabit.core.ui.components.weather.getWeatherIcon
 import com.talhapps.climabit.core.ui.mvi.useMvi
 import com.talhapps.climabit.domain.model.weather.AirQualityResponse
 import com.talhapps.climabit.domain.model.weather.OpenMeteoResponse
+import com.talhapps.climabit.presentation.details.components.WeatherDetailsShimmer
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -148,16 +147,13 @@ fun WeatherDetailsScreen(
             }
         }
     ) { paddingValues ->
-        if (state.isAnyLoading && state.weather == null && state.airQuality == null) {
-            Box(
+        if (state.isAnyLoading) {
+            WeatherDetailsShimmer(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .consumeWindowInsets(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
+                    .consumeWindowInsets(paddingValues)
+            )
         } else {
             LazyColumn(
                 modifier = Modifier

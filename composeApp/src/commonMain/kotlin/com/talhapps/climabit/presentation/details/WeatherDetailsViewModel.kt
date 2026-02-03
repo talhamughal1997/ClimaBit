@@ -14,6 +14,7 @@ import com.talhapps.climabit.domain.usecase.gemini.GetGeminiInsightsUseCase
 import com.talhapps.climabit.domain.usecase.weather.GetAirQualityUseCase
 import com.talhapps.climabit.domain.usecase.weather.GetOneCallUseCase
 import com.talhapps.climabit.domain.usecase.weather.GetReverseGeocodingUseCase
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 data class WeatherDetailsState(
@@ -82,6 +83,8 @@ class WeatherDetailsViewModel(
 
             var weatherLoaded = false
             var airQualityLoaded = false
+
+            delay(3000)
 
             getOneCallUseCase(WeatherRequest(lat = lat, lng = lon))
                 .observe(
