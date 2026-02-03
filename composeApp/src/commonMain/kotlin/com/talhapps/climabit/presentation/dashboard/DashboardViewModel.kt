@@ -13,6 +13,7 @@ import com.talhapps.climabit.domain.usecase.gemini.GetGeminiInsightsUseCase
 import com.talhapps.climabit.domain.usecase.weather.GetCurrentWeatherDataUseCase
 import com.talhapps.climabit.domain.usecase.weather.GetOneCallUseCase
 import com.talhapps.climabit.domain.usecase.weather.GetReverseGeocodingUseCase
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 data class DashboardState(
@@ -88,7 +89,7 @@ class DashboardViewModel(
     private fun loadWeather(lat: Double, lon: Double) {
         viewModelScope.launch {
             updateState { copy(isLoading = true, error = null) }
-
+            delay(3000)
             getCurrentWeatherDataUseCase(WeatherRequest(lat = lat, lng = lon))
                 .observe(
                     onLoading = { updateState { copy(isLoading = true) } },

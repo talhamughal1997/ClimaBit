@@ -38,6 +38,7 @@ import com.talhapps.climabit.core.ui.mvi.useMvi
 import com.talhapps.climabit.domain.model.weather.OpenMeteoResponse
 import com.talhapps.climabit.presentation.dashboard.components.AdditionalInfoCard
 import com.talhapps.climabit.presentation.dashboard.components.DashboardHeader
+import com.talhapps.climabit.presentation.dashboard.components.DashboardShimmer
 import com.talhapps.climabit.presentation.dashboard.components.MainWeatherCard
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -136,13 +137,19 @@ private fun DashboardContent(
             onRefresh = onRefresh,
             state = pullRefreshState
         ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
+            if (state.isLoading) {
+                DashboardShimmer(
+                    modifier = Modifier.fillMaxSize()
+                )
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
 
-                item {
+                    item {
                     val locationName = state.location?.name
                         ?: "${state.weather?.timezone}"
 
@@ -198,6 +205,7 @@ private fun DashboardContent(
                         AdditionalInfoCard(weather = weather)
                     }
                 }
+            }
             }
         }
     }
