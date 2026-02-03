@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.launch
 
 abstract class MviViewModel<State : UiState, Intent : UiIntent, Effect : UiEffect>(
@@ -54,6 +55,7 @@ abstract class MviViewModel<State : UiState, Intent : UiIntent, Effect : UiEffec
     }
 
     protected fun <T> Flow<T>.observe(
+        retries: Long = 1,
         onLoading: () -> Unit = {},
         onSuccess: (T) -> Unit,
         onError: (Throwable) -> Unit = {}
@@ -61,6 +63,7 @@ abstract class MviViewModel<State : UiState, Intent : UiIntent, Effect : UiEffec
         viewModelScope.launch {
             this@observe
                 .onStart { onLoading() }
+                .retry(retries = retries)
                 .catch { onError(it) }
                 .collect(onSuccess)
         }

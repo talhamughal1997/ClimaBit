@@ -5,9 +5,11 @@ import com.talhapps.climabit.core.ui.mvi.MviViewModel
 import com.talhapps.climabit.core.ui.mvi.UiEffect
 import com.talhapps.climabit.core.ui.mvi.UiIntent
 import com.talhapps.climabit.core.ui.mvi.UiState
+import com.talhapps.climabit.domain.model.gemini.GeminiInsightRequest
 import com.talhapps.climabit.domain.model.weather.GeocodingResponse
 import com.talhapps.climabit.domain.model.weather.OpenMeteoResponse
 import com.talhapps.climabit.domain.model.weather.WeatherRequest
+import com.talhapps.climabit.domain.usecase.gemini.GetGeminiInsightsUseCase
 import com.talhapps.climabit.domain.usecase.weather.GetCurrentWeatherDataUseCase
 import com.talhapps.climabit.domain.usecase.weather.GetOneCallUseCase
 import com.talhapps.climabit.domain.usecase.weather.GetReverseGeocodingUseCase
@@ -18,7 +20,10 @@ data class DashboardState(
     val weather: OpenMeteoResponse? = null,
     val oneCallData: OpenMeteoResponse? = null,
     val location: GeocodingResponse? = null,
-    val error: String? = null
+    val error: String? = null,
+    val aiInsights: String? = null,
+    val isLoadingAIInsights: Boolean = false,
+    val aiInsightsError: String? = null
 ) : UiState
 
 sealed interface DashboardIntent : UiIntent {
@@ -26,6 +31,7 @@ sealed interface DashboardIntent : UiIntent {
     object RefreshWeather : DashboardIntent
     object NavigateToSettings : DashboardIntent
     data class LoadWeatherByLocation(val lat: Double, val lon: Double) : DashboardIntent
+    object LoadAIInsights : DashboardIntent
 }
 
 sealed interface DashboardEffect : UiEffect {
@@ -37,7 +43,8 @@ sealed interface DashboardEffect : UiEffect {
 class DashboardViewModel(
     private val getCurrentWeatherDataUseCase: GetCurrentWeatherDataUseCase,
     private val getOneCallUseCase: GetOneCallUseCase,
-    private val getReverseGeocodingUseCase: GetReverseGeocodingUseCase
+    private val getReverseGeocodingUseCase: GetReverseGeocodingUseCase,
+    private val getGeminiInsightsUseCase: GetGeminiInsightsUseCase
 ) : MviViewModel<DashboardState, DashboardIntent, DashboardEffect>(
     initialState = DashboardState()
 ) {
@@ -70,6 +77,10 @@ class DashboardViewModel(
 
             is DashboardIntent.LoadWeatherByLocation -> {
                 loadWeather(intent.lat, intent.lon)
+            }
+
+            is DashboardIntent.LoadAIInsights -> {
+                loadAIInsights()
             }
         }
     }
@@ -120,6 +131,60 @@ class DashboardViewModel(
                         updateState { copy(location = location) }
                     },
                     onError = {
+                    }
+                )
+        }
+    }
+
+    private fun loadAIInsights() {
+        val weather = currentState.weather
+        val oneCallData = currentState.oneCallData
+        val location = currentState.location
+
+        if (weather == null) {
+            sendEffect(DashboardEffect.ShowError("Weather data not available"))
+            return
+        }
+
+        viewModelScope.launch {
+            updateState {
+                copy(
+                    isLoadingAIInsights = true,
+                    aiInsightsError = null,
+                    aiInsights = null
+                )
+            }
+
+            val prompt =
+                com.talhapps.climabit.core.ui.util.WeatherDataFormatter.formatDashboardPrompt(
+                    weather = weather,
+                    oneCallData = oneCallData,
+                    locationName = location?.name
+                )
+
+            getGeminiInsightsUseCase(GeminiInsightRequest(prompt = prompt))
+                .observe(
+                    retries = 3,
+                    onLoading = {
+                        updateState { copy(isLoadingAIInsights = true) }
+                    },
+                    onSuccess = { response ->
+                        val insights = response.getText()
+                        updateState {
+                            copy(
+                                isLoadingAIInsights = false,
+                                aiInsights = insights,
+                                aiInsightsError = null
+                            )
+                        }
+                    },
+                    onError = { error ->
+                        updateState {
+                            copy(
+                                isLoadingAIInsights = false,
+                                aiInsightsError = error.message ?: "Failed to load AI insights"
+                            )
+                        }
                     }
                 )
         }

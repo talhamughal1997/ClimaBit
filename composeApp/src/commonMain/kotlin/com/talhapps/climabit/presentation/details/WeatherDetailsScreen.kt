@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Air
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Directions
 import androidx.compose.material.icons.filled.ShutterSpeed
@@ -29,14 +30,19 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,6 +51,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.talhapps.climabit.core.ui.components.dialog.AIInsightsBottomSheet
 import com.talhapps.climabit.core.ui.components.weather.getWeatherDescription
 import com.talhapps.climabit.core.ui.components.weather.getWeatherIcon
 import com.talhapps.climabit.core.ui.mvi.useMvi
@@ -89,6 +96,19 @@ fun WeatherDetailsScreen(
         }
     )
 
+    var showAIInsights by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+
+    if (showAIInsights) {
+        AIInsightsBottomSheet(
+            sheetState = sheetState,
+            insights = state.aiInsights,
+            isLoading = state.isLoadingAIInsights,
+            error = state.aiInsightsError,
+            onDismiss = { showAIInsights = false }
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -111,6 +131,21 @@ fun WeatherDetailsScreen(
                     }
                 }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    showAIInsights = true
+                    viewModel.handleIntent(WeatherDetailsIntent.LoadAIInsights)
+                },
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            ) {
+                Icon(
+                    imageVector = Icons.Default.AutoAwesome,
+                    contentDescription = "AI Insights"
+                )
+            }
         }
     ) { paddingValues ->
         if (state.isAnyLoading && state.weather == null && state.airQuality == null) {
