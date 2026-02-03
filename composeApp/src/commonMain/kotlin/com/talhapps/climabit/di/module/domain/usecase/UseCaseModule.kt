@@ -15,6 +15,7 @@ import com.talhapps.climabit.domain.usecase.weather.GetOneCallUseCase
 import com.talhapps.climabit.domain.usecase.weather.GetReverseGeocodingUseCase
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
@@ -30,6 +31,11 @@ val useCaseModule = module {
     singleOf(::GetGeocodingUseCase).bind<UseCase<String, List<GeocodingResponse>>>()
     singleOf(::GetReverseGeocodingUseCase).bind<UseCase<WeatherRequest, GeocodingResponse?>>()
 
-    singleOf(::GetGeminiInsightsUseCase).bind<UseCase<GeminiInsightRequest, GeminiResponse>>()
+    single {
+        GetGeminiInsightsUseCase(
+            geminiRepository = get(),
+            defaultModel = get(named("geminiModel"))
+        )
+    }.bind<UseCase<GeminiInsightRequest, GeminiResponse>>()
 
 }

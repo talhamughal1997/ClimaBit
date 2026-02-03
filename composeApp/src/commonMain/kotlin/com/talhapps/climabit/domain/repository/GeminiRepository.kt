@@ -7,12 +7,12 @@ import kotlinx.coroutines.flow.Flow
 interface GeminiRepository {
     fun generateInsights(
         prompt: String,
-        model: String = "gemini-3-flash-preview"
+        model: String
     ): Flow<GeminiResponse>
 
     fun generateInsights(
         request: GeminiRequest,
-        model: String = "gemini-3-flash-preview"
+        model: String
     ): Flow<GeminiResponse>
 }
 

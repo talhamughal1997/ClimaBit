@@ -7,7 +7,6 @@ import com.talhapps.climabit.core.ui.mvi.UiIntent
 import com.talhapps.climabit.core.ui.mvi.UiState
 import com.talhapps.climabit.domain.model.weather.GeocodingResponse
 import com.talhapps.climabit.domain.usecase.weather.GetGeocodingUseCase
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 data class SearchState(
@@ -50,7 +49,7 @@ class SearchViewModel(
     private fun searchLocation(query: String) {
         viewModelScope.launch {
             updateState { copy(isLoading = true, error = null) }
-            delay(3000)
+
             getGeocodingUseCase(query)
                 .observe(
                     onLoading = { updateState { copy(isLoading = true) } },

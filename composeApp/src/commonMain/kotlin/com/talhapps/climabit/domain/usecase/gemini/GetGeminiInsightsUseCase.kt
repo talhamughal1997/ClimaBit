@@ -7,7 +7,8 @@ import com.talhapps.climabit.domain.repository.GeminiRepository
 import kotlinx.coroutines.flow.flowOf
 
 class GetGeminiInsightsUseCase(
-    private val geminiRepository: GeminiRepository
+    private val geminiRepository: GeminiRepository,
+    private val defaultModel: String
 ) : UseCase<GeminiInsightRequest, GeminiResponse> {
 
     override fun invoke(params: GeminiInsightRequest?) =
@@ -22,9 +23,10 @@ class GetGeminiInsightsUseCase(
                 )
             )
         } else {
+            val model = params.model.ifEmpty { defaultModel }
             geminiRepository.generateInsights(
                 prompt = params.prompt,
-                model = params.model
+                model = model
             )
         }
 }

@@ -21,6 +21,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
@@ -62,6 +63,10 @@ val dataModule = module {
         GeminiApiImpl(
             client = get()
         )
+    }
+
+    single(named("geminiModel")) {
+        "gemini-2.5-flash-lite"
     }
 
     singleOf(::GeminiRepositoryImpl).bind<GeminiRepository>()

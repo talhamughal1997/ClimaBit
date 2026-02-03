@@ -7,12 +7,12 @@ import kotlinx.coroutines.flow.Flow
 interface GeminiApi {
     fun generateContent(
         prompt: String,
-        model: String = "gemini-3-flash-preview"
+        model: String
     ): Flow<GeminiResponse>
 
     fun generateContent(
         request: GeminiRequest,
-        model: String = "gemini-3-flash-preview"
+        model: String
     ): Flow<GeminiResponse>
 }
 
