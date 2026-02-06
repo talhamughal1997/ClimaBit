@@ -1,311 +1,149 @@
-# 🌤️ ClimaBit - Weather App Portfolio
+# ClimaBit - Weather App Portfolio
 
-A beautiful, modern weather application built with **Kotlin Multiplatform** that works on **Android,
-iOS, Desktop, and Web** - all from one codebase!
+A modern weather application built with Kotlin Multiplatform that works on Android, iOS, Desktop,
+and Web platforms. This is a portfolio project demonstrating multiplatform development skills.
 
-## 📱 What is ClimaBit?
+## Overview
 
-ClimaBit is a complete weather application that shows you:
+ClimaBit is a complete weather application that provides real-time weather information, forecasts,
+and air quality data. The app is built using Kotlin Multiplatform and Jetpack Compose Multiplatform,
+allowing it to run on multiple platforms from a single codebase.
 
-- **Current Weather** - Temperature, humidity, wind speed, and more
-- **7-Day Forecast** - See what the weather will be like for the week
-- **Hourly Forecast** - Hour-by-hour weather predictions
-- **Air Quality Index (AQI)** - Know the air quality in your area
-- **Location Search** - Find weather for any city worldwide
-- **Beautiful UI** - Modern Material Design 3 interface
+## Features
 
-## 🎯 Key Features
+- Get current weather conditions including temperature, humidity, wind speed, and more
+- View 7-day weather forecast with detailed predictions
+- See hourly weather forecasts for the day
+- Check Air Quality Index with color-coded indicators
+- Search for weather in any city worldwide
+- View detailed weather information with comprehensive data
+- AI-powered weather insights using Google Gemini API
+- Beautiful Material Design 3 interface
+- Dark and light theme support
+- Responsive design that works on phones, tablets, and desktops
+- Shimmer loading effects for better user experience
 
-### ✨ User Features
+## Technologies
 
-- **Real-time Weather Data** - Get current weather conditions instantly
-- **Multi-day Forecast** - Plan ahead with 7-day weather predictions
-- **Air Quality Monitoring** - Check AQI with color-coded indicators
-- **Location Search** - Search and save multiple locations
-- **Pull to Refresh** - Easy data refresh with a simple swipe
-- **Dark/Light Theme** - Beautiful themes that adapt to your preference
-- **Responsive Design** - Works perfectly on phones, tablets, and desktops
+- Kotlin Multiplatform
+- Clean Architecture
+- Jetpack Compose Multiplatform for UI development
+- MVI (Model-View-Intent) architecture pattern
+- Koin for Dependency Injection
+- Ktor for network requests
+- Google Gemini API for AI insights
+- Open-Meteo API for weather data
 
-### 🏗️ Technical Features
+## Libraries
 
-- **Multiplatform** - One codebase for Android, iOS, Desktop, and Web
-- **Clean Architecture** - Well-organized code following best practices
-- **MVI Pattern** - Modern state management for predictable UI
-- **Dependency Injection** - Using Koin for clean dependency management
-- **Reusable Components** - Shared UI components across all screens
-- **Type-Safe Navigation** - Safe navigation between screens
+- [Koin](https://insert-koin.io/) - Kotlin dependency injection library with multiplatform support
+- [Ktor](https://ktor.io/docs/http-client-multiplatform.html) - Provides multiplatform libraries
+  required to make network calls to REST APIs
+- [ViewModel](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-viewmodel.html) -
+  Compose Multiplatform ViewModel for state management
+- [Coil](https://coil-kt.github.io/coil/) - Image loading library for Compose Multiplatform
+- [kotlinx.coroutines](https://github.com/Kotlin/kotlinx.coroutines) - Library support for Kotlin
+  coroutines with multiplatform support
+- [kotlinx.serialization](https://github.com/Kotlin/kotlinx.serialization) - Provides libraries for
+  JSON serialization
+- [kotlinx.datetime](https://github.com/Kotlin/kotlinx-datetime) - A multiplatform Kotlin library
+  for working with date and time
+- [Navigation Compose](https://developer.android.com/jetpack/compose/navigation) - Navigation
+  component for Compose Multiplatform
+- [Material 3 Adaptive](https://developer.android.com/jetpack/compose/layouts/adaptive) - Adaptive
+  layouts for different screen sizes
 
-## 🏛️ Project Architecture
+## Getting Started
 
-This project follows **Clean Architecture** principles with clear separation of concerns:
+### Installation
 
-```
-📦 ClimaBit
-├── 📁 data/              → Data layer (API calls, repositories)
-│   ├── remote/          → API interfaces and implementations
-│   ├── repository/      → Repository implementations
-│   └── core/            → Data utilities
-│
-├── 📁 domain/            → Business logic layer
-│   ├── model/           → Data models (Weather, AQI, etc.)
-│   ├── repository/      → Repository interfaces
-│   └── usecase/         → Business use cases
-│
-├── 📁 presentation/      → UI layer (Screens and ViewModels)
-│   ├── dashboard/       → Main weather screen
-│   ├── forecast/        → 7-day forecast screen
-│   ├── details/         → Detailed weather view
-│   ├── search/          → Location search screen
-│   └── settings/        → App settings
-│
-├── 📁 core/              → Shared core utilities
-│   ├── ui/              → UI components and MVI framework
-│   │   ├── components/  → Reusable UI components
-│   │   │   ├── weather/ → Weather-related components
-│   │   │   ├── card/    → Card components
-│   │   │   ├── aqi/     → Air quality components
-│   │   │   └── util/    → Utility components
-│   │   └── mvi/         → MVI architecture framework
-│   ├── config/          → Configuration (API keys)
-│   └── domain/          → Core domain interfaces
-│
-├── 📁 di/                → Dependency Injection modules
-│   ├── module/          → Koin modules
-│   └── init/            → Koin initialization
-│
-└── 📁 navigation/        → App navigation
-```
-
-## 🛠️ Technologies Used
-
-### Core Technologies
-
-- **Kotlin Multiplatform** - Write once, run everywhere
-- **Jetpack Compose Multiplatform** - Modern declarative UI
-- **Ktor** - HTTP client for API calls
-- **Kotlinx Serialization** - JSON parsing
-- **Koin** - Dependency injection
-- **Coroutines & Flow** - Asynchronous programming
-
-### Architecture Patterns
-
-- **MVI (Model-View-Intent)** - State management pattern
-- **Clean Architecture** - Separation of concerns
-- **Repository Pattern** - Data abstraction
-- **Use Case Pattern** - Business logic encapsulation
-
-### APIs Used
-
-- **Open-Meteo API** - Weather data
-- **Google Gemini API** - AI-powered weather insights
-
-## 📂 Project Structure Explained
-
-### Data Layer (`data/`)
-
-Handles all data operations:
-
-- **WeatherApi** - Fetches weather data from Open-Meteo
-- **GeminiApi** - Gets AI insights from Google Gemini
-- **Repositories** - Implement business logic for data fetching
-
-### Domain Layer (`domain/`)
-
-Contains business logic:
-
-- **Models** - Data structures (Weather, AQI, Location)
-- **Repository Interfaces** - Contracts for data operations
-- **Use Cases** - Business operations (GetWeather, GetForecast, etc.)
-
-### Presentation Layer (`presentation/`)
-
-All UI components:
-
-- **Screens** - Main app screens (Dashboard, Forecast, Details, Search)
-- **ViewModels** - Manage screen state and business logic
-- **Components** - Reusable UI pieces
-
-### Core Layer (`core/`)
-
-Shared utilities and frameworks:
-
-- **MVI Framework** - Custom MVI implementation for state management
-- **UI Components** - Reusable components used across screens
-- **Utilities** - Helper functions (time formatting, weather icons, etc.)
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- **Android Studio** (Hedgehog or newer)
-- **JDK 11** or higher
-- **Xcode** (for iOS development - macOS only)
-- **Node.js** (for web development)
-
-### Setup Steps
-
-1. **Clone the repository**
+1. Clone this repository:
    ```bash
    git clone <repository-url>
    cd ClimaBit
    ```
 
-2. **Add API Keys**
-    - Create a file `composeApp/src/commonMain/kotlin/com/talhapps/climabit/core/config/ApiKeys.kt`
-    - Add your API keys:
-      ```kotlin
-      object ApiKeys {
-          const val GEMINI_API_KEY = "your-gemini-api-key"
-      }
-      ```
+2. Open in the latest version of Android Studio.
 
-3. **Build the project**
-   ```bash
-   ./gradlew build
+3. Before running the project, obtain an API key from [Google AI](https://ai.google.dev) to
+   communicate with the Gemini API.
+
+4. Create a file `composeApp/src/commonMain/kotlin/com/talhapps/climabit/core/config/ApiKeys.kt` and
+   add your API key:
+   ```kotlin
+   object ApiKeys {
+       const val GEMINI_API_KEY = "YOUR_API_KEY"
+   }
    ```
 
-### Running on Different Platforms
+5. Run the following Gradle tasks to build the project:
+    - Sync Gradle files
+    - Build the project
 
-#### 📱 Android
+### Run the app on your device or emulator
 
-```bash
-./gradlew :composeApp:assembleDebug
-```
+- For Android, run the `composeApp` module by selecting the `app` configuration. If you need help
+  with the configuration, follow this link
+  for [Android](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-multiplatform-create-first-app.html#run-your-application-on-android)
 
-Or use Android Studio's run button.
+- For iOS, run the `composeApp` module by selecting the `iosApp` configuration. If you need help
+  with the configuration, follow this link
+  for [iOS](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-multiplatform-create-first-app.html#run-your-application-on-ios)
 
-#### 🖥️ Desktop (JVM)
+- For Desktop, run `./gradlew :composeApp:run`
 
-```bash
-./gradlew :composeApp:run
-```
+- For Web, run `./gradlew :composeApp:wasmJsBrowserDevelopmentRun`
 
-#### 🌐 Web (Wasm - Recommended)
+## Project Structure
 
-```bash
-./gradlew :composeApp:wasmJsBrowserDevelopmentRun
-```
+The project follows Clean Architecture principles with clear separation of concerns:
 
-#### 🌐 Web (JS - Older browsers)
+- **data** - Data layer containing API calls and repository implementations
+- **domain** - Business logic layer with models, repository interfaces, and use cases
+- **presentation** - UI layer with screens, ViewModels, and components
+- **core** - Shared utilities, UI components, and MVI framework
+- **di** - Dependency injection modules using Koin
+- **navigation** - App navigation components and utilities
 
-```bash
-./gradlew :composeApp:jsBrowserDevelopmentRun
-```
+## Architecture
 
-#### 🍎 iOS
+The app uses Clean Architecture with MVI (Model-View-Intent) pattern:
 
-1. Open `iosApp/iosApp.xcodeproj` in Xcode
-2. Select your target device
-3. Click Run
+- **Data Layer** - Handles all data operations including API calls to Open-Meteo and Gemini APIs
+- **Domain Layer** - Contains business logic, models, and use cases
+- **Presentation Layer** - Manages UI state and user interactions using MVI pattern
+- **Core Layer** - Provides reusable components and utilities shared across the app
 
-## 📸 Screenshots
+## Screenshots
 
-The app includes:
+The app includes the following screens:
 
-- **Dashboard Screen** - Main weather overview with current conditions
-- **Forecast Screen** - 7-day weather forecast with day selection
-- **Details Screen** - Comprehensive weather details with charts
-- **Search Screen** - Find weather for any location
-- **Settings Screen** - App preferences
+- Dashboard Screen - Main weather overview with current conditions and hourly forecast
+- Forecast Screen - 7-day weather forecast with detailed day selection
+- Details Screen - Comprehensive weather details with charts and additional information
+- Search Screen - Find weather for any location worldwide
+- Settings Screen - App preferences and configuration
 
-## 🎨 Design Highlights
+## Contributing
 
-- **Material Design 3** - Modern, beautiful UI
-- **Custom Theme** - High-contrast color schemes
-- **Poppins Font** - Clean, readable typography
-- **Adaptive Layout** - Responsive design for all screen sizes
-- **Smooth Animations** - Polished user experience
+Feel free to contribute to this project by submitting issues, pull requests, or providing valuable
+feedback. Your contributions are always welcome.
 
-## 🏗️ Architecture Highlights
-
-### MVI Pattern
-
-The app uses a custom MVI (Model-View-Intent) implementation:
-
-- **State** - Represents UI state
-- **Intent** - User actions
-- **Effect** - Side effects (navigation, errors)
-- **Reducer** - Pure functions for state updates
-
-### Component Organization
-
-- **Common Components** - Shared across all screens (cards, utilities)
-- **Screen Components** - Specific to each screen
-- **Reusable Utilities** - Weather icons, descriptions, time formatting
-
-### Clean Code Principles
-
-- ✅ No code comments (self-documenting code)
-- ✅ Single Responsibility Principle
-- ✅ Dependency Inversion
-- ✅ Separation of Concerns
-- ✅ Type Safety
-
-## 📊 Code Statistics
-
-- **Total Kotlin Files**: 66+
-- **Screens**: 5 main screens
-- **ViewModels**: 5 ViewModels
-- **Use Cases**: 6 use cases
-- **API Interfaces**: 2 (Weather, Gemini)
-- **Reusable Components**: 10+ shared components
-- **Platforms Supported**: 4 (Android, iOS, Desktop, Web)
-
-## 🔧 Development
-
-### Project Structure Best Practices
-
-- **Data Layer** - All API calls and data sources
-- **Domain Layer** - Business logic and models
-- **Presentation Layer** - UI and user interaction
-- **Core Layer** - Shared utilities and frameworks
-
-### Adding New Features
-
-1. Create data models in `domain/model/`
-2. Add API calls in `data/remote/`
-3. Create repository in `data/repository/`
-4. Add use case in `domain/usecase/`
-5. Create ViewModel in `presentation/[screen]/`
-6. Build UI in screen file
-
-## 📝 License
-
-This project is a portfolio piece demonstrating:
-
-- Kotlin Multiplatform development
-- Clean Architecture principles
-- Modern Android/iOS development
-- UI/UX design skills
-- API integration
-- State management patterns
-
-## 👨‍💻 Portfolio Highlights
+## Portfolio Highlights
 
 This project showcases:
 
-- ✅ **Multiplatform Development** - One codebase, multiple platforms
-- ✅ **Modern Architecture** - Clean Architecture with MVI pattern
-- ✅ **UI/UX Design** - Beautiful, responsive Material Design 3
-- ✅ **API Integration** - RESTful API consumption
-- ✅ **State Management** - Custom MVI framework implementation
-- ✅ **Code Organization** - Well-structured, maintainable codebase
-- ✅ **Best Practices** - Following Kotlin and Android best practices
-- ✅ **Reusability** - Shared components and utilities
+- Multiplatform development skills with Kotlin Multiplatform
+- Clean Architecture implementation
+- Modern UI development with Jetpack Compose
+- API integration with RESTful services
+- State management using MVI pattern
+- Code organization and best practices
+- Reusable component design
+- Responsive and adaptive layouts
 
-## 🤝 Contributing
+## Author
 
-This is a portfolio project. Feel free to:
+**Talha Mughal**
 
-- Fork the repository
-- Study the code structure
-- Use as a reference for your own projects
-- Suggest improvements
-
-## 📧 Contact
-
-For questions or feedback about this portfolio project, feel free to reach out!
-
----
-
-**Built with ❤️ using Kotlin Multiplatform and Jetpack Compose**
+This is a portfolio project demonstrating multiplatform development capabilities.
