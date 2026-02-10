@@ -1,5 +1,6 @@
 package com.talhapps.climabit.presentation.settings
 
+import com.talhapps.climabit.core.theme.ThemeManager
 import com.talhapps.climabit.core.ui.mvi.MviViewModel
 import com.talhapps.climabit.core.ui.mvi.UiEffect
 import com.talhapps.climabit.core.ui.mvi.UiIntent
@@ -21,8 +22,10 @@ sealed interface SettingsEffect : UiEffect {
     data class ShowMessage(val message: String) : SettingsEffect
 }
 
-class SettingsViewModel() : MviViewModel<SettingsState, SettingsIntent, SettingsEffect>(
-    initialState = SettingsState()
+class SettingsViewModel(
+    private val themeManager: ThemeManager
+) : MviViewModel<SettingsState, SettingsIntent, SettingsEffect>(
+    initialState = SettingsState(isDarkTheme = themeManager.isDarkTheme)
 ) {
     override fun onIntent(intent: SettingsIntent) {
         when (intent) {
@@ -43,8 +46,9 @@ class SettingsViewModel() : MviViewModel<SettingsState, SettingsIntent, Settings
             }
 
             is SettingsIntent.ToggleTheme -> {
+                themeManager.toggleTheme()
                 updateState {
-                    copy(isDarkTheme = !isDarkTheme)
+                    copy(isDarkTheme = themeManager.isDarkTheme)
                 }
             }
         }
