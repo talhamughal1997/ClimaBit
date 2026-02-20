@@ -124,10 +124,6 @@ The app includes the following screens:
 - Search Screen - Find weather for any location worldwide
 - Settings Screen - App preferences and configuration
 
-## Contributing
-
-Feel free to contribute to this project by submitting issues, pull requests, or providing valuable
-feedback. Your contributions are always welcome.
 
 ## Portfolio Highlights
 
